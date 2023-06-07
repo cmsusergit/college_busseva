@@ -1,7 +1,9 @@
 <script>
-        import "@picocss/pico"
 </script>
 
-<div class="container">
-    <slot></slot>
+<div class="container" data-theme="light">
+    <slot>
+
+    </slot>
 </div>
+

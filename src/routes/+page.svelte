@@ -1,2 +1,21 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+    import { onMount } from 'svelte';
+    
+    import pb from '$lib/db.js'
+    let ayearList=''
+    onMount(async()=>{
+        try{
+            ayearList = await pb.collection('academic_year').getFullList({sort: '-created',})
+        }
+        catch(error){
+            console.log(error)
+
+        
+        }
+    })
+</script>
+<div>
+    <h1>Hello There</h1>
+
+    <p>{JSON.stringify(ayearList)}</p>
+</div>

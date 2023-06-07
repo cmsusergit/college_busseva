@@ -1,6 +1,19 @@
 {
 	"compilerOptions": {
-		"paths": {},
+		"paths": {
+			"lib": [
+				"../src/lib"
+			],
+			"lib/*": [
+				"../src/lib/*"
+			],
+			"$lib": [
+				"../src/lib"
+			],
+			"$lib/*": [
+				"../src/lib/*"
+			]
+		},
 		"rootDirs": [
 			"..",
 			"./types"
