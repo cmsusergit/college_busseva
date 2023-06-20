@@ -1,29 +1,75 @@
 <script>
-	import { enhance } from '$app/forms'
+	import { applyAction, enhance } from '$app/forms'
 
-	export let form
-	let loading = false
+</script>
+<form
+	method="POST"
+	class="card"
+	use:enhance={() => {
+		return async ({ result }) => {await applyAction(result)		
+	}}}>
+	<h1 class="text-2xl mb-8">Log in</h1>
 
-	const submitLogin = () => {
-		loading = true
-		return async ({ result, update }) => {
-			switch (result.type) {
-				case 'success':
-					await update()
-					break;
-				case 'invalid':
-					console.log('Invalid credentials')
-					await update();
-					break;
-				case 'error':
-					console.log(result.error.message)
-					break;
-				default:
-					await update()
+
+	<div class="form-control gap-2 mb-4">
+		<input
+		type="email"
+		name="email"
+		placeholder="Email"
+		class="input input-bordered"
+		/>
+		<input
+		type="password"
+		name="password"
+		placeholder="Password"
+		class="input input-bordered"
+		/>
+		<button class="btn btn-primary">Log in</button>
+	</div>
+</form>
+<!-- <script>
+    import { goto } from '$app/navigation'
+
+	import pb from '$lib/db.js'
+	let loading=false
+	let email='',password=''
+	const onlogin=async()=>{
+		try {
+			await pb.collection("users").authWithPassword(email,password)
+			if (!pb?.authStore?.model?.verified) {
+				pb.authStore.clear()
 			}
-			loading = false
-		};
-	};
+
+			goto('/dashboard')
+		} 		
+		catch (error) {
+			console.log('****',error)
+			alert(error.message)
+		}
+	}
+	// import { enhance } from '$app/forms'
+	// export let form
+	// let loading = false
+	// const submitLogin = () => {
+	// 	loading = true
+	// 	return async ({ result, update }) => {
+	// 		switch (result.type) {
+	// 			case 'success':
+	// 				await update()
+	// 				break;
+	// 			case 'invalid':
+	// 				console.log('Invalid credentials')
+	// 				await update();
+	// 				break;
+	// 			case 'error':
+	// 				console.log(result.error.message)
+	// 				break;
+	// 			default:
+	// 				await update()
+	// 		}
+	// 		loading = false
+	// 	};
+	// };
 </script>
 <div class="container">
 	<h2>
@@ -34,7 +80,18 @@
 			>register</a
 		> if you don't already have an account.
 	</p>
-	<form
+	<form on:submit={onlogin}>
+		<input bind:value={email} type="email" id="email" label="Email"/>
+		<input bind:value={password} type="password" id="password" label="Password"/>
+		<div>
+			<a href="/reset-password">Forgot Password?</a>
+		</div>
+		<div>
+			<button type="submit" class="" disabled={loading}>Login</button>
+        </div>
+	</form>
+-->
+	<!-- <form
 		action="?/login"
 		method="POST"
 		use:enhance={submitLogin}
@@ -85,5 +142,7 @@
 				</div>
 			</div>
 		{/if}
-	</form>
-</div>
+
+
+	</form> --><!--
+</div> -->

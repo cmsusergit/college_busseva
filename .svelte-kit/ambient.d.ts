@@ -130,7 +130,8 @@ declare module '$env/static/private' {
  * ```
  */
 declare module '$env/static/public' {
-	
+	export const PUBLIC_PB_URL: string;
+	export const PUBLIC_PB_TEST: string;
 }
 
 /**
@@ -256,6 +257,8 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
+		PUBLIC_PB_URL: string;
+		PUBLIC_PB_TEST: string;
 		[key: `PUBLIC_${string}`]: string | undefined;
 	}
 }
