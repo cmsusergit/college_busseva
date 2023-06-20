@@ -1,18 +1,24 @@
 <script>
-    import Menu from '$lib/component/menu.svelte'
+  import "../app.postcss";
 
-    import Header from '$lib/component/header.svelte'
-    export let data
+  import Menu from "$lib/component/menu.svelte";
+  import Header from "$lib/component/header.svelte";
+  export let data;
 </script>
-<div class="container" data-theme="light">
-    <Header/>
+<div class="lg:mx-24">
+    <Header />
+    <Menu is_auth="{data?.profile}"/>
+    <div class="mx-auto w-full">
 
-    <Menu is_auth={data?.profile}/>
-    <div style="margin: 1em;min-height: 100vh;">
-        <slot></slot>
+
+      <main class="min-h-screen w-full">
+        <slot />
+      </main>
     </div>
 
     <div style="margin:1em;text-align: center;">
-        Sardar Vallabhbhai Patel Institute of Technlogy, Vasad
+      Sardar Vallabhbhai Patel Institute of Technlogy, Vasad
     </div>
 </div>
+
+
