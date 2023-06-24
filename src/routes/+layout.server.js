@@ -4,4 +4,4 @@ export const load = ({ locals }) => {
 			profile: JSON.parse(JSON.stringify(locals.user))
 		};
 	}
-};
+}; 

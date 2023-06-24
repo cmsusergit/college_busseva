@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit'
+import { fail, redirect } from '@sveltejs/kit'
 
 
 // export const load = ({ locals }) => {
@@ -18,7 +18,7 @@ export const actions={
 
     } catch (e) {
         console.error(e)
-        throw e
+        return fail(400,{error:e.message})
     }
     throw redirect(303, '/')
     },

@@ -4,21 +4,35 @@ import pb from '$lib/db.js'
 import { Alert,Button,Radio,Heading,Spinner,Select,Label } from 'flowbite-svelte'    
 import {Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from 'flowbite-svelte'
 import _ from 'lodash'
+import { onMount } from 'svelte';
 export let data
 let mesg=''
 let selectedRoute,error_mesg=''
 let route_bus_point=[],selectedBusPP
 let bus_pp_list_changed=[],loading=false
+
 $:onRouteSelected(selectedRoute)
-
-
+onMount(()=>{
+    if(data?.route_id){
+        selectedRoute=data?.routeList?.find(ob=>ob.id==data?.route_id)
+        onRouteSelected(selectedRoute)
+    }
+})
 const onRouteSelected=async(value)=>{
     const id=value?.id    
-    route_bus_point = await pb.collection('route_bus_point').getFullList({sort:'sequence',filter:`route="${id}"`, expand: 'bus_point',})
-    bus_pp_list_changed=[]
-    for (let indx = 0; indx < route_bus_point.length; indx++) {
-        const record = route_bus_point[indx].expand.bus_point
-        bus_pp_list_changed.push(record)
+    if(!id)return
+    try{
+        pb.autoCancellation(false)
+        route_bus_point = await pb.collection('route_bus_point').getFullList({sort:'sequence',filter:`route='${id}'`, expand: 'bus_point',})
+        bus_pp_list_changed=[]
+        for (let indx = 0; indx < route_bus_point.length; indx++) {
+            const record = route_bus_point[indx].expand.bus_point
+            bus_pp_list_changed.push(record)
+        }
+    }
+    catch(error1){
+        console.log('****',error1)
+        error_mesg=error1.message
     }
 }
 const removeRecord=(record)=>{
@@ -58,15 +72,9 @@ const saveChange=async()=>{
     }finally{
         loading=false
     }
+    
 }
 </script>
-
-
-
-
-
-
-
 <div class="px-4 md:px-8">
     {#if mesg}
         <Alert color="green" dismissable>{mesg}</Alert>
@@ -137,17 +145,26 @@ const saveChange=async()=>{
         {:else}
             <p class="text-orange-700 p-2 text-xl text-center">Empty Table</p>   
         {/if}
-        <div class="mt-4 text-right">
+
+        <div hidden={!bus_pp_list_changed?.length>0} class="mt-4 text-right">
             <Button color="blue" on:click={saveChange} class="md:w-48 w-full">
                 {#if loading}
                     <Spinner class="mr-4 text-lg" size={4}/> Please Wait....
-
-                
                 {:else}
                     Save Change
                 {/if}
             </Button>
         </div>
-    {/if}
-</div>
 
+
+
+
+
+
+
+
+
+
+
+        {/if}
+</div>

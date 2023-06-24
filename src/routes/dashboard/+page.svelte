@@ -1,10 +1,17 @@
 <script>
-    import {currentUser} from '$lib/db'
+    import { page } from '$app/stores'
 
 </script>
 <div>
-    <p>{JSON.stringify($currentUser)}</p>
-    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Enim quasi officia numquam beatae voluptates ratione, cumque voluptatem doloribus, modi dolor ut magni culpa. Sapiente asperiores reiciendis quas? Optio, laboriosam magnam quod quisquam voluptas tenetur eaque, repudiandae natus error doloribus vel repellendus incidunt vitae, iure nemo perspiciatis. Odio ipsum aut odit voluptates, fugiat nulla voluptatibus laudantium dolores dignissimos amet quisquam sapiente laborum tempora deleniti commodi debitis molestias error quidem. Doloremque repellendus facere est culpa maiores eaque sequi. Quidem, debitis totam. Perferendis, dicta? Eaque praesentium pariatur consequuntur atque aliquid laborum voluptatem sit, nobis delectus sapiente fuga ullam hic modi laboriosam porro fugiat perspiciatis perferendis. Non, illo omnis suscipit nam, adipisci fuga corrupti, ipsum ratione doloribus unde at ullam. Praesentium, quos distinctio laudantium assumenda obcaecati fugit impedit excepturi ipsam voluptatum quis fugiat architecto repudiandae nostrum aperiam odit laboriosam delectus saepe, ab minus eaque possimus? Deleniti alias nam ea harum omnis laborum aliquid totam quisquam? Delectus, atque? Cumque, deserunt sed explicabo numquam debitis dicta eos quos atque omnis, consequatur esse consequuntur quia odit a iste quod. Aliquid ex vel, placeat ipsum qui quam asperiores eaque rem. Natus libero deleniti at quas expedita est reprehenderit autem iste animi cupiditate. Possimus molestiae corrupti labore repellat ipsam veritatis eligendi incidunt vitae nemo porro earum rerum esse placeat, neque pariatur sed delectus consequuntur quisquam debitis, cum adipisci obcaecati? Laborum, optio aperiam ad odio itaque impedit nemo facere illo? Nemo in ex architecto temporibus provident quod laboriosam dignissimos error asperiores. A veritatis facere eaque dicta debitis consectetur itaque, tenetur cum, labore nihil, soluta esse assumenda! Architecto accusantium in molestias nulla enim commodi optio fugit facilis temporibus eaque pariatur eum, odit amet corporis labore unde mollitia. Officia fuga cum quae est, sint dolorem accusantium similique, nostrum vero blanditiis quidem. Maxime delectus porro quasi doloremque deserunt molestias voluptate cum accusantium qui voluptates eos voluptas officiis illo laudantium numquam quaerat suscipit magni impedit quae, velit quo distinctio eaque voluptatum corrupti! Alias ut odio, laborum sed praesentium voluptatem, expedita earum, nihil labore dolor cumque! Alias odit quis asperiores magnam ipsum quos cupiditate ex nisi ea labore fugiat distinctio nostrum dolorum voluptatum debitis voluptas aut, ducimus ut veniam rerum, vero quasi. Officiis dicta, ea similique minima sequi laborum eveniet. Accusamus veritatis porro voluptatibus harum! Ab, nesciunt, enim vel maxime pariatur aperiam ipsum, sunt saepe illo dignissimos necessitatibus ullam! Id ratione molestias doloremque, voluptate impedit perferendis eum corrupti. Itaque sapiente numquam iusto hic debitis a! Dignissimos, deleniti. Doloremque nostrum dolores architecto. Autem veniam, hic voluptates fuga enim unde provident distinctio ex, cumque sapiente incidunt nihil quaerat esse! Error modi quaerat dolorem officiis quae laborum ea numquam, repellat dignissimos sunt corporis id. Atque, dolor deleniti ea mollitia laborum dicta rerum cum modi aliquid? Enim neque, esse, praesentium blanditiis repellat harum nesciunt aut ex provident nam commodi voluptas sed cumque tempore minima illum magni delectus maiores quas reiciendis aliquam quos maxime eius explicabo. Tempora explicabo repellat accusantium corporis consequuntur accusamus recusandae error harum quaerat fugit laudantium fugiat sint, cupiditate illo ipsum, repellendus alias magnam, est magni. Fugit.</p>
+    {#if $page?.data?.profile?.role=='ADMIN'}
+        <h1 class="text-xl text-center">ADMIN</h1>        
+    {:else if $page?.data?.profile?.role=='TRAVELLER'}
+        <h1 class="text-xl text-center">Traveller</h1>
+    {:else if $page?.data?.profile?.role=='OPERATOR'}
+        <h1 class="text-xl text-center">Operator</h1>
+
+
+    {:else}
+        <h1 class="text-xl text-center">Guest</h1>
+    {/if}
 </div>
-
-
