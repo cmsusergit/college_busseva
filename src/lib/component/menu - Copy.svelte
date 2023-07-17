@@ -4,11 +4,41 @@
     import pb from '$lib/db'
     import { applyAction,enhance } from '$app/forms';
     import { page } from '$app/stores';
-    export let is_auth
-	let showDlg=false
-    
+    export let is_auth,showDlg=false
+    let record={"id":is_auth.id,
+            "password": "",
+            "passwordConfirm": "",
+            "oldPassword":""
+    }
 
-</script><!--     
+    // const onsubmit=async()=>{
+    //     // try{
+    //     //     if(record.password.length<8){
+    //     //         alert("Password must be greater then 8 character long")
+    //     //         return
+    //     //     }
+    //     //     if(record.password!==record.passwordConfirm){
+    //     //         alert("Password & Confirm Password does nt match")
+    //     //         return 
+    //     //     }
+    //     //     await pb.collection('users').update(is_auth.id, record)
+    //     //     alert("Password Updated")
+    //     // }catch(error1){
+    //     //     alert(error1)
+    //     //     console.log('****',error1)
+    //     // }
+    //     // finally{
+    //     //     showDlg=false
+    //     // }
+
+
+
+
+
+
+
+    // }
+</script>     
 <Modal bind:open={showDlg} title="Change Password">
     <div>
         <form>
@@ -30,7 +60,7 @@
             </div>
         </form>    
     </div>
-</Modal>-->
+</Modal>
 <div class="m-4 border-y">
     {#if is_auth}
         <Navbar class="text-lg p-0" let:hidden let:toggle>
