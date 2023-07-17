@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  app:
+    image: node:20-alpine
+    command: sh -c "npm install && npm start"
+    ports:
+      - 8080:3000
+    working_dir: /app
+    volumes:
+      - ./app:/app
+
+
+    # environment:
+    #   MYSQL_HOST: mysql
+    #   MYSQL_USER: root
+    #   MYSQL_PASSWORD: root
+    #   MYSQL_DB: todos
+
+  pb:
+    image: augustodelg/pocketbase:latest
+    ports:
+      - 8090:8090
+    volumes:
+      - pb-data:/pb_data
+volumes:
+  pb-data:

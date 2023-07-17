@@ -46,8 +46,8 @@ export const receipt_print=async (id)=>{
         fontSize:11,
         text:[            
             'Received ',{text:`${currencyFormat.format(record.amount_paid)}`,bold:true,fontSize:11,decoration:'underline'}, 
-            ` Cash/Online\nFrom, `,{text:` ${record.stu_name} (${record.enrollment_number})\n`,bold:true},
 
+            ` Cash/Online  ${record.transaction_id?'Transaction ID: '+record.transaction_id:''}\nFrom, `,{text:` ${record.stu_name.toUpperCase()} (${record.enrollment_number})\n`,bold:true},
             {text:'Contact Number:  ',bold:true},`${record.stu_contact_number}  `,{text:'Email:  ',bold:true},`${record.stu_email}\n`,
             {text:'Course:  ',bold:true},`${course.name} (${course.alias})\n`,
             {text:'Department:  ',bold:true},`${department.name} (${department.alias}) \nOn `,
@@ -70,7 +70,7 @@ export const receipt_print=async (id)=>{
         const footText='*This is a computer generated document , hence no signature is required'
     let reportDefination=[        
         {
-			text: "Receipt for Payment of Transport Contractor's Fare",
+			text: "Receipt for Payment of Transportation",
             fontSize:17,
             alignment:'center',
             bold:true

@@ -9,11 +9,11 @@
     let loading_dept=false,loading=false
     export let data
     let selectedRouteRecord,orderPlaced
-    let isRecordExist=false,image
+    let isRecordExist=false
 
     let formData = new FormData()
     let is_submitted=false
-    let feesRecord={
+    const initialFormValue={
       "order_id": 0,
       "route": 0,
       "enrollment_number": "",      
@@ -25,6 +25,7 @@
       "course": '',
       "department": '',
       "sem": '',
+      "transaction_id":"",
       "amount_paid": 0.0,
       "amount_total": 0.0,
       "payment_status":false,
@@ -35,6 +36,7 @@
     }
     let semList=[1,2,3,4,5,6,7,8,9,10],departmentList=[]
     let mesg,error_mesg
+    let feesRecord=initialFormValue
     const fetchDepartmentList=async(value)=>{
       try{
             if(value==''){
@@ -104,13 +106,13 @@
         feesRecord.receipt_number=new Date().getFullYear()+'_'+receipt_record.number.toString().padStart(5, '0')
         feesRecord.payment_date=new Date().toISOString()
         _.forEach(feesRecord,(value,name)=>{
+          if(name=='stu_name'){
+            formData.append(name,value.toUpperCase())
+          }
+
           if(name!='photo')
             formData.append(name,value)
         })
-        
-
-
-
         record = await pb.collection('bus_fees').create(formData)
         if(record && feesRecord.payment_type=='ONLINE'){
           placeOrder(record.id)
@@ -118,6 +120,7 @@
           return
         }
         else{
+          feesRecord.id=record.id
           await pb.collection('bus_fees').update(record.id,{payment_status:true})
           await pb.collection('receipt_number').update(receipt_record.id,{number:receipt_record.number+1});
           is_submitted=true
@@ -235,14 +238,21 @@ const onFileChange=async()=>{
     for (let file of fileInput.files) {
       feesRecord.photo=file.name
       const reader = new FileReader();
-      reader.addEventListener("load", function () {
-        image.setAttribute("src", reader.result);
+
+      if(file.size>=2097152){
+        error_mesg='Photo Size must be less then 2MB'
+        window.scrollTo(0,0)
+        return
+      }
+      reader.addEventListener("load", function () {        
+        feesRecord.photo=reader.result
       });
       reader.readAsDataURL(file);
       formData.append('photo', file)
     }  
 }
 const generateReceipt=async()=>{  
+  console.log('----',feesRecord)
   receipt_print(feesRecord.id)
 }
 </script>
@@ -268,7 +278,7 @@ const generateReceipt=async()=>{
     {:else}
       <Button on:click={()=>{doPayment();isRecordExist=false;}} color="blue">Proceed To Payment</Button>
     {/if}
-    <Button on:click={()=>{isRecordExist=false;invalidateAll();}} >Close</Button>
+    <Button on:click={()=>{isRecordExist=false;feesRecord=initialFormValue;}} >Close</Button>
     </div> 
   </div>
 </div>
@@ -300,7 +310,8 @@ const generateReceipt=async()=>{
                 <option value={record.id}>{record.name}</option>
               {/each}
             </Select>
-        </div> 
+
+          </div> 
         <div>
           <Label class="mb-2 text-lg" for="stu_email">Student Email<span class="ml-1 text-orange-700">*</span></Label>
           <Input on:blur={fetchRecordWithEmail} bind:value={feesRecord.stu_email} type="email" id="stu_email" name="stu_email" required/>      
@@ -310,11 +321,8 @@ const generateReceipt=async()=>{
             <Label for="enrollment_number" class="mb-2 text-lg">Enrollment/College ID/Form Number<span class="ml-1 text-orange-700">*</span></Label>
             <Input bind:value={feesRecord.enrollment_number} type="text" id="enrollment_number" name="enrollment_number" required />
           </div>
-
-
           <div>
-            <Label for="enrollment_number" class="mb-2 text-lg">Student Name<span class="ml-1 text-orange-700">*</span></Label>
-            
+            <Label for="enrollment_number" class="mb-2 text-lg">Student Name<span class="ml-1 text-orange-700">*</span></Label>            
             <Input on:change={(ee)=>ee.target.value=ee.target.value.toUpperCase()} bind:value={feesRecord.stu_name} type="text" id="stu_name" name="stu_name" required />
           </div>
         </div>
@@ -328,13 +336,12 @@ const generateReceipt=async()=>{
             <Input bind:value={feesRecord.parent_contact_number} type="text" id="parent_contact_number" name="parent_contact_number" required/>
           </div>    
         </div> 
-        
         <div>
           {#if feesRecord?.photo}
-            <img class="w-48 h-48" bind:this={image} src={feesRecord.photo} alt=""/>
+            <img class="w-48 h-48" src={feesRecord.photo} alt=""/>
           {/if}
-          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">*</span></Label>
-          <Input on:change={onFileChange} type="file" id="fileInput" required></Input>
+          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB)</span></Label>
+          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput" required></Input>
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-{2+1}">
           <div>
@@ -403,6 +410,7 @@ const generateReceipt=async()=>{
           <div>
             <Label class="mb-2 text-lg">Payement Amount</Label>
             <Input bind:value={feesRecord.amount_total} disabled></Input>
+
           </div>
           {#if data?.profile}
             <div>
@@ -414,11 +422,14 @@ const generateReceipt=async()=>{
               </div>
             </div>      
           {/if}
-        </div>
+        </div>        
         {#if feesRecord.payment_type=='QRCODE'}
-
         <div class="w-full flex justify-center border">
-          <Img src="qr.png" width="250"></Img>
+            <Img src="qr.jpg" width="512"></Img>
+          </div> 
+          <div>
+            <Label class="mb-2 text-lg" for="reference_id">Transaction ID/Reference ID<span class="ml-1 text-orange-700">*</span></Label>
+            <Input bind:value={feesRecord.transaction_id} type="text" id="reference_id" name="reference_id" required={feesRecord.payment_type=='QRCODE'}/>
         </div> 
         {/if}
         <div class="flex justify-end w-full py-4 mt-4 border-t rounded">
@@ -427,13 +438,8 @@ const generateReceipt=async()=>{
               <Spinner color="white" class="mr-4 text-lg" size={4}/> Please Wait....
             {:else}
               Submit
-
-
-
-
             {/if}
           </Button>
-          
         </div>
     </form>  
   {/if}

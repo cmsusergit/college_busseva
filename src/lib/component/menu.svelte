@@ -61,13 +61,21 @@
                         <DropdownItem><a class="text-lg" href="/department">Department</a></DropdownItem>
                     </Dropdown>
                 {/if}
-            </NavUl>            
-            <Avatar class="m-1 md:m-0" id="avatar-menu" src={pb.files.getUrl(is_auth,is_auth.avatar)} />
+            </NavUl>           
+
+
+
+
+
+            <Avatar class="m-1 md:m-0" id="avatar-menu" src={pb.files.getUrl(is_auth,is_auth.avatar)} onerror="this.onerror=null; this.src='placeholder.jpg';"/>
             <NavHamburger on:click={toggle} class1="w-full md:flex md:w-auto md:order-1"/>        
         </Navbar>
-
-
-
-    
         {/if}
 </div>  
+
+
+
+
+
+
+

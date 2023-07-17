@@ -1,5 +1,5 @@
 <script>
-    import { invalidateAll } from '$app/navigation';
+    import { invalidateAll } from '$app/navigation'
 
     import { Input,Alert,Button,Heading,Modal,Spinner,Select, Label } from 'flowbite-svelte'    
     import {Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell} from 'flowbite-svelte'
@@ -12,15 +12,20 @@
     }
 
     let mesg,error_mesg
-    let showDlg=false
+    let showDlg=false,payment_amount=0.0
     let loading=false,recordToRemove
     const onsubmit=async()=>{
         try{
             loading=true
-            if(!courseRecord.id)
-                await pb.collection('course').create(courseRecord)
-            else
+            if(!courseRecord.id){
+                const record=await pb.collection('course').create(courseRecord)
+                await pb.collection('route_total_payment').create({amount_total:payment_amount,course:record.id});
+            }
+            else{
                 await pb.collection('course').update(courseRecord.id,courseRecord)
+                const temprecord1=await pb.collection('route_total_payment').getFirstListItem('course=courseRecord.id')
+                await pb.collection('route_total_payment').update(temprecord1.id,{amount_total:payment_amount})
+            }
             mesg='Successfully Inserted/Updated'
             error_mesg=''
         }catch(error1){
@@ -35,6 +40,7 @@
     }
     const addRecord=()=>{
         showDlg=true
+        payment_amount=0.0
         courseRecord={
             "name": '',
             "alias":'',
@@ -77,9 +83,16 @@
         <Heading class="mb-4 text-center" tag="h4">Course Management</Heading>    
         {#if showDlg}
             <form on:submit|preventDefault={onsubmit}>                
+                <div class="grid gap-5 grid-cols-2 mt-2">
                 <div>
                     <Label class="mb-2 text-lg" for="name">Name<span class="ml-1 text-orange-700">*</span></Label>            
                     <Input bind:value={courseRecord.name} id="name" type="text" required/>
+                </div>
+
+                    <div>
+                        <Label class="mb-2 text-lg" for="payment_amount">Payment Amount<span class="ml-1 text-orange-700">*</span></Label>            
+                        <Input bind:value={payment_amount} id="payment_amount" type="number" required/>
+                    </div>
                 </div>
                 <div class="grid gap-5 grid-cols-2 mt-2">                       
                     <div>
