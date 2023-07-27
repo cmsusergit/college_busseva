@@ -4,3 +4,9 @@ pb_db
 util.js
 .env
 pb_db.zip
+bend
+cmsbusseva_app.*
+docker-compose.yml
+.svelte-kit
+nginx
+payment.*

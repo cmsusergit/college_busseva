@@ -85,10 +85,12 @@ let columnList=[
     const export2excel=()=>{
         loading=true
         let list1=new Array() 
-        dataTable.map(ob=>{            
-                let temp=_.pick(ob,["stu_name","enrollment_number","traveller","department","stu_contact_number","bus_point","cash","qrcode","online","done_by"])
+        dataTable.map(ob=>{         
+                let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","done_by"])
                 list1.push(temp)
         })
+
+        list1=_.orderBy(list1,["payment_date","receipt_number"],['asc','asc'])
         const wsheet=XLSX.utils.json_to_sheet(list1)
         const wb=XLSX.utils.book_new()            
         XLSX.utils.book_append_sheet(wb,wsheet,"report")
@@ -96,22 +98,19 @@ let columnList=[
         loading=false
     }
 </script>
-
 <div class="mb-4 border">
     <div  class="flex md:flex-row flex-col">
         <div class="flex flex-col w-full md:w-1/2 m-1 px-1">
             <label for="from_dt" class="text-slate-800 px-1 py-1 font-bold">From Date</label>
             <input bind:value={from_dt} type="date" class="border rounded px-1 py-1 border-blue-400" name="from_dt" id="from_dt">
         </div>        
-
-
         <div class="flex flex-col w-full md:w-1/2 m-1 px-1">
             <label for="to_dt" class="text-slate-800 px-1 py-1 font-bold">To Date</label>
             <input bind:value={to_dt} type="date" class="border rounded px-1 py-1 border-blue-400" name="to_dt" id="to_dt">
         </div>
     </div>
-
 </div>
+
 {#if dataTable && dataTable.length>0}
     <div class="flex justify-end">    
         <button on:click={export2excel} class="hover:bg-teal-400 bg-teal-500 px-4 py-2 text-white rounded">{loading?'Loading....':'Export Excel'}</button>
