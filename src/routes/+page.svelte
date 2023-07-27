@@ -1,16 +1,17 @@
-<script>
+<script> 
     import pb from '$lib/db.js'
 
     import { Input,Alert,Button,P,Img,Radio,Spinner,Select, Label } from 'flowbite-svelte'    
+    import { env } from '$env/dynamic/public'
     import { onMount } from 'svelte'
     import {invalidateAll,goto} from '$app/navigation'
-    import _ from 'lodash'
+    import _ from 'lodash'    
     import {receipt_print} from '$lib/reciept_print.js'
     let loading_dept=false,loading=false
     export let data
     let selectedRouteRecord,orderPlaced
-    let isRecordExist=false
 
+    let isRecordExist=false
     let formData = new FormData()
     let is_submitted=false
     const initialFormValue={
@@ -70,7 +71,9 @@
       }
     }
     onMount(async()=>{      
+      feesRecord=initialFormValue
     })
+
     const onRouteSelected=async(dt)=>{
       if(!dt)return
       console.log('----',dt)
@@ -106,22 +109,28 @@
         feesRecord.receipt_number=new Date().getFullYear()+'_'+receipt_record.number.toString().padStart(5, '0')
         feesRecord.payment_date=new Date().toISOString()
         _.forEach(feesRecord,(value,name)=>{
+
+          
           if(name=='stu_name'){
             formData.append(name,value.toUpperCase())
           }
-
           if(name!='photo')
             formData.append(name,value)
         })
         record = await pb.collection('bus_fees').create(formData)
+        console.log('----',record)
         if(record && feesRecord.payment_type=='ONLINE'){
-          placeOrder(record.id)
+          orderPlaced={
+            receipt:feesRecord?.id,
+            amount:feesRecord?.amount_paid,
+          }
           loading=false
           return
         }
         else{
           feesRecord.id=record.id
-          await pb.collection('bus_fees').update(record.id,{payment_status:true})
+          console.log('----',record.id)
+          await pb.collection('bus_fees').update(feesRecord.id,{payment_status:true})
           await pb.collection('receipt_number').update(receipt_record.id,{number:receipt_record.number+1});
           is_submitted=true
           goto('/')
@@ -135,54 +144,49 @@
       loading=false
     }
   }
-  const onpaid=async(ob)=>{
-      if(ob.razorpay_payment_id){
-        loading=true
-        console.log('****',orderPlaced)
+  const doPayment=async()=>{
+    loading=true
         try{
-          await pb.collection('bus_fees').update(orderPlaced?orderPlaced.receipt:feesRecord.id,{payment_status:true})
-          mesg=`Payment Successfull ${ob.razorpay_payment_id}`
-        }catch(error1){
-          console.log('****',error1)             
-          error_mesg=error1
-        }
-        finally{
-          loading=false
-          orderPlaced=null
-        }
-      }
-      // 
-      // const  rzrpy = new Razorpay({ key_id: 'rzp_test_JYdzDk5tUT2JJR', key_secret: 'xa9HFuV4XeapBYVqNE9AX3AL' })
-      // var { validatePaymentVerification, validateWebhookSignature } = require('./dist/utils/razorpay-utils');
-      // validatePaymentVerification({"order_id": razorpayOrderId, "payment_id": razorpayPaymentId }, signature, secret);
-  }
-  const placeOrder=async(id)=>{
-        loading=true
-        try{
-          const dt = await fetch('/api/payment', {
+          const requestRecord={
+            merchant_id:env.PUBLIC_MID,
+            order_id:feesRecord.id,            
+            amount: feesRecord.amount_paid,
+            currency:'INR',
+            redirect_url:'http://localhost:8080/api/ccAvenueResponse',
+            cancel_url:'http://localhost:8080/api/ccAvenueResponse',
+            language:'EN',            
+            billing_name:feesRecord.stu_name,
+            billing_address:'Vasad',
+            billing_city:'Vasad',
+            billing_state:'Gujrat',            
+            billing_zip:'388306',
+            billing_country:'India',
+            billing_tel:feesRecord.stu_contact_number,
+            billing_email:feesRecord.stu_email            
+          }
+          fetch('/api/payment', {
               method: 'POST',
-              body: JSON.stringify({
-                amount: feesRecord.amount_total*100,
-                currency: "INR",
-                receipt: id??'',
-              }),
+              body: JSON.stringify(requestRecord),
               headers: {
                   'content-type': 'application/json'
               }
-          })
-          orderPlaced=await dt.json()
-          if(orderPlaced?.error)
-          {
-            error_mesg=orderPlaced.error.description
-            orderPlaced=null
-          }
-          else{
-            console.log(id,orderPlaced.id)
-            feesRecord.order_id=orderPlaced.id
-            const record1=await pb.collection('bus_fees').update(id,{order_id:orderPlaced.id})
-            console.log('----',record1)
-            mesg="Payment Initiated"
-          }
+          }).then(async(rr)=>{
+              const tt=await rr.text()
+              goto(tt)
+          })          // orderPlaced=await dt.json()
+          // if(orderPlaced?.error)
+          // {
+          //   error_mesg=orderPlaced.error.description
+          //   orderPlaced=null
+          // }
+          // else{
+
+          //   console.log(id,orderPlaced.id)
+          //   feesRecord.order_id=orderPlaced.id
+          //   const record1=await pb.collection('bus_fees').update(id,{order_id:orderPlaced.id})
+          //   console.log('----',record1)
+          //   mesg="Payment Initiated"
+          // }
         }catch(error1){
           console.log('****',error1)             
           error_mesg=error1
@@ -191,48 +195,6 @@
         finally{
           loading=false
         }
-  }
-  const doPayment=async()=>{
-        loading=true
-        try{
-          const options = {
-            "key": "rzp_test_JYdzDk5tUT2JJR", 
-            "amount": feesRecord.amount_total*100,
-            "currency": "INR",
-            "name": "SVIIT Bus Seva Application",
-            "description": "Test",
-            "image": "",
-            "order_id": feesRecord.order_id,
-            "prefill": { 
-              "name": feesRecord.stu_name,
-              "email": feesRecord.stu_email,
-              "contact": feesRecord.stu_contact_number            
-            },
-            "handler": function(response){
-              onpaid(response)
-            },
-            "notes": {
-                "address": "Vasad"
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-          }
-          const rzp1 = new Razorpay(options)
-          rzp1.on('payment.failed', function (response){
-            alert(response.error.description);
-            alert(response.error.reason);
-            alert(response.error.metadata.order_id);
-            alert(response.error.metadata.payment_id);
-          });
-          rzp1.open()
-    }catch(error1){
-      console.log('****',error1)   
-      error_mesg=error1.message
-    }
-    finally{
-      loading=false 
-    }
 }
 const onFileChange=async()=>{  
     for (let file of fileInput.files) {
@@ -251,6 +213,8 @@ const onFileChange=async()=>{
       formData.append('photo', file)
     }  
 }
+
+
 const generateReceipt=async()=>{  
   console.log('----',feesRecord)
   receipt_print(feesRecord.id)

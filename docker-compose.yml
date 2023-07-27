@@ -1,27 +1,41 @@
 version: "3.7"
-
 services:
+
+  nginx:
+    image: nginx:latest
+    volumes:
+        - ./nginx:/etc/nginx
+    depends_on:
+      - app      
+      - pb
+    ports:
+      - "80:80"
+
   app:
     image: node:20-alpine
     command: sh -c "npm install && npm start"
     ports:
-      - 8080:3000
+      - 8080:8040
     working_dir: /app
+    depends_on:
+      - pb
     volumes:
-      - ./app:/app
-
-
-    # environment:
-    #   MYSQL_HOST: mysql
-    #   MYSQL_USER: root
-    #   MYSQL_PASSWORD: root
-    #   MYSQL_DB: todos
-
+      - ./:/app:rw
   pb:
-    image: augustodelg/pocketbase:latest
+    image: spectado/pocketbase:latest
     ports:
-      - 8090:8090
+      - 8090:80
     volumes:
-      - pb-data:/pb_data
-volumes:
-  pb-data:
+    - ./bend/pb_data:/pb_data:Z  
+
+
+
+
+
+
+
+
+
+
+
+

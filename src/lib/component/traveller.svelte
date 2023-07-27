@@ -87,7 +87,7 @@
             loading=true
             let list1=new Array() 
             dataTable.map(ob=>{            
-                    let temp=_.pick(ob,["stu_name","enrollment_number","traveller","department","stu_contact_number","bus_point","cash","qrcode","online","done_by"])
+                    let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","done_by"])
                     list1.push(temp)
             })
             const wsheet=XLSX.utils.json_to_sheet(list1)

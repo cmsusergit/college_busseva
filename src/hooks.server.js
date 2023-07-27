@@ -12,7 +12,7 @@ export const handle = async ({ event, resolve }) => {
 		return response
 
 	}
-	if(event.route.id=='/' || event.route.id=='/api/payment'){
+	if(event.route.id=='/' || event.route.id=='/response' || event.route.id?.includes('/api/')){
 		return await resolve(event)
 	}
 	else if(!event.locals.user){
