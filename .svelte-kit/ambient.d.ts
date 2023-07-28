@@ -129,6 +129,8 @@ declare module '$env/static/public' {
 	export const PUBLIC_TEST: string;
 	export const PUBLIC_ACCESSCODE: string;
 	export const PUBLIC_MID: string;
+	export const PUBLIC_CCAVENUE_URL: string;
+	export const PUBLIC_WEBURL: string;
 }
 
 /**
@@ -253,6 +255,8 @@ declare module '$env/dynamic/public' {
 		PUBLIC_TEST: string;
 		PUBLIC_ACCESSCODE: string;
 		PUBLIC_MID: string;
+		PUBLIC_CCAVENUE_URL: string;
+		PUBLIC_WEBURL: string;
 		[key: `PUBLIC_${string}`]: string | undefined;
 	}
 }

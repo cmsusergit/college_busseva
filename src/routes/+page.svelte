@@ -152,7 +152,7 @@
             order_id:feesRecord.id,            
             amount: feesRecord.amount_paid,
             currency:'INR',
-            redirect_url:'https://college-busseva.vercel.app/api/ccAvenueResponse',
+            redirect_url:'http://college-busseva.vercel.app/api/ccAvenueResponse',
             cancel_url:'https://college-busseva.vercel.app/api/ccAvenueResponse',
             language:'EN',            
             billing_name:feesRecord.stu_name,
@@ -221,7 +221,6 @@ const generateReceipt=async()=>{
 }
 </script>
 
-<h1>Hello There</h1>
 {#if data?.status=='error'}
   <Alert dismissable>{data?.error}</Alert>
 {/if}

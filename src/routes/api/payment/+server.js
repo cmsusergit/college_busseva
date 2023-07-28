@@ -10,10 +10,11 @@ export const POST=async(event) =>{
         let encRequest=''
         let requestDt=''
         for (const ob in dt) {
+
             requestDt+=`${ob}=${dt[ob]}&`
         }
-        encRequest=encrypt(requestDt,cred)
-        let ccAvenueUrl=`https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${dt.merchant_id}&encRequest=${encRequest}&access_code=${accessCode}`
+        encRequest=encrypt(requestDt,cred) 
+        let ccAvenueUrl=`${PUBLIC_CCAVENUE_URL}/transaction/transaction.do?command=initiateTransaction&merchant_id=${dt.merchant_id}&encRequest=${encRequest}&access_code=${accessCode}`
         try {
             return text(ccAvenueUrl)
         } catch (error) {
