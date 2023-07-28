@@ -10,8 +10,8 @@ onMount(()=>{
     responseList.push({name:"Record Status",value:data.response?.order_status})
     if(data.response?.order_status.includes("Success")){
         responseList.push({name:"Record ID",value:data.response?.order_id})
-        responseList.push({name:"Name",value:data.response?.billing_name})
-    
+
+        responseList.push({name:"Name",value:data.response?.billing_name})    
         responseList.push({name:"Email",value:data.response?.billing_email})
         responseList.push({name:"Tracking ID",value:data.response?.tracking_id})        
         responseList.push({name:"Payment Mode",value:data.response?.payment_mode})
