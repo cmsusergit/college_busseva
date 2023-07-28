@@ -220,6 +220,8 @@ const generateReceipt=async()=>{
   receipt_print(feesRecord.id)
 }
 </script>
+
+<h1>Hello There</h1>
 {#if data?.status=='error'}
   <Alert dismissable>{data?.error}</Alert>
 {/if}
