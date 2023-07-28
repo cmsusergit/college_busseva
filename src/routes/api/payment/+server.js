@@ -1,7 +1,7 @@
 import { json, text } from '@sveltejs/kit'
 import { env } from '$env/dynamic/public'
 
-import {encrypt} from '$lib/util/ccavutil'
+import {encrypt} from '$lib/util/ccavutil'   
 export const POST=async(event) =>{
     const dt=await event.request.json()
     try{
