@@ -14,8 +14,8 @@ export const POST=async(event) =>{
             requestDt+=`${ob}=${dt[ob]}&`
         }
         encRequest=encrypt(requestDt,cred) 
-        console.log('----https://secure.ccavenue.com----');
         let ccAvenueUrl=`https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${dt.merchant_id}&encRequest=${encRequest}&access_code=${accessCode}`
+        console.log('----',ccAvenueUrl)
         try {
             return text(ccAvenueUrl)
         } catch (error) {

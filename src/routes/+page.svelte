@@ -120,10 +120,12 @@
         record = await pb.collection('bus_fees').create(formData)
         console.log('----',record)
         if(record && feesRecord.payment_type=='ONLINE'){
+          feesRecord.id=record.id
           orderPlaced={
-            receipt:feesRecord?.id,
-            amount:feesRecord?.amount_paid,
+            receipt:record?.id,
+            amount:record?.amount_paid,
           }
+          console.log('----****',orderPlaced)
           loading=false
           return
         }
@@ -253,7 +255,7 @@ const generateReceipt=async()=>{
     <P class="text-center font-bold">Contact: {feesRecord?.stu_contact_number}</P>
     <P class="text-center font-bold">Email: {feesRecord?.stu_email}</P>
     <P class="text-center font-bold">Payment Receipt Number: {orderPlaced?.receipt}</P>
-    <P class="pb-4 mb-4 text-center font-bold border-b">Payment Amount: {orderPlaced?.amount/100.0} {orderPlaced?.currency}</P>
+    <P class="pb-4 mb-4 text-center font-bold border-b">Payment Amount: {orderPlaced?.amount}</P>
     <Button on:click={doPayment} color="green" class="mr-2">Proceed To Payment</Button>
     <Button on:click={()=>{orderPlaced=null;invalidateAll();}} color="red">Cancel</Button>
   </div>
