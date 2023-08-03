@@ -19,7 +19,7 @@ export const POST=async(event) =>{
     }
     console.log(response)
     throw redirect(302,`/response?response=${JSON.stringify(ccavResponse)}`)       
-}    
+}     
 
 
 
