@@ -12,10 +12,10 @@ export const POST=async(event) =>{
         for (const ob in dt) {
 
             requestDt+=`${ob}=${dt[ob]}&`
-        }
-        
+        }        
         const sub_account_id='NESTFEE2023'
-        requestDt['sub_account_id']=sub_account_id
+        requestDt+=`sub_account_id=${sub_account_id}`
+        console.log('****',requestDt);
         encRequest=encrypt(requestDt,cred) 
         let ccAvenueUrl=`https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${dt.merchant_id}&encRequest=${encRequest}&access_code=${accessCode}`
         console.log('----',ccAvenueUrl)

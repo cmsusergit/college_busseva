@@ -17,7 +17,7 @@ export const POST=async(event) =>{
         await pb.collection('bus_fees').update(ccavResponse.order_id,{'order_id':ccavResponse.tracking_id,payment_status:true})                                            
         console.log('----',ccavResponse.order_id)
     }
-    console.log(response)
+    console.log(ccavResponse)
     throw redirect(302,`/response?response=${JSON.stringify(ccavResponse)}`)       
 }     
 
