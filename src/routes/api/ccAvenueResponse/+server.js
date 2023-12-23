@@ -4,22 +4,24 @@ import { env } from '$env/dynamic/public'
 import {redirect } from '@sveltejs/kit'
 import {decrypt} from '$lib/util/ccavutil'
 import qs from 'querystring'
-
 export const POST=async(event) =>{
     const dt=await event.request.text()
     const temp1=qs.parse(dt)
     var encryption = temp1.encResp
     const cred=env.PUBLIC_PAYMENT_CRED
-
     const response=decrypt(encryption,cred)
+
     const ccavResponse = qs.parse(response)
+    console.log('++++',ccavResponse)
     if(ccavResponse.order_status?.includes('Success')){
         await pb.collection('bus_fees').update(ccavResponse.order_id,{'order_id':ccavResponse.tracking_id,payment_status:true})                                            
         console.log('----',ccavResponse.order_id)
     }
+
     console.log(ccavResponse)
     throw redirect(302,`/response?response=${JSON.stringify(ccavResponse)}`)       
 }     
+
 
 
 
