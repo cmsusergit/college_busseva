@@ -105,12 +105,23 @@
       let record
       if(!isRecordExist){
         loading=true
-        const receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
+        let receipt_record=null
+        try{
+          receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
+        }catch(error1){
+        
+        
+            if(!receipt_record){
+            const temp1 = {
+                "number": 1,
+                "academic_year": feesRecord.academic_year
+            };
+            receipt_record = await pb.collection('receipt_number').create(temp1)
+          }
+        }
         feesRecord.receipt_number=new Date().getFullYear()+'_'+receipt_record.number.toString().padStart(5, '0')
         feesRecord.payment_date=new Date().toISOString()
         _.forEach(feesRecord,(value,name)=>{
-
-          
           if(name=='stu_name'){
             formData.append(name,value.toUpperCase())
           }

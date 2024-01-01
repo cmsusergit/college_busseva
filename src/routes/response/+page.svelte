@@ -67,8 +67,11 @@ const printReceipt=()=>{
                 <Button on:click={printReceipt} class="w-48 rounded">Receipt</Button>
             </div>
         {/if}
+        <a href="/">Go to Form Again</a>
     </div>
     {/if}
 </div>
+
+
 
 
