@@ -31,7 +31,13 @@ export const receipt_print=async (id)=>{
     const content1={
         margin:[2,10,2,10],
         columns:[
-            {text:`Receipt Number: ${record.receipt_number}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
+
+
+
+
+
+
+            {text:`Receipt Number: ${record.id}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
             {table:{body:[[{image:'photo',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'}
         ]
     }
