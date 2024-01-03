@@ -31,7 +31,13 @@ export const receipt_print=async (id)=>{
     const content1={
         margin:[2,10,2,10],
         columns:[
-            {text:`Receipt Number: ${record.receipt_number}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
+
+
+
+
+
+
+            {text:`Receipt Number: ${record.id}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
             {table:{body:[[{image:'photo',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'}
         ]
     }
@@ -46,8 +52,7 @@ export const receipt_print=async (id)=>{
         fontSize:11,
         text:[            
             'Received ',{text:`${currencyFormat.format(record.amount_paid)}`,bold:true,fontSize:11,decoration:'underline'}, 
-
-            ` Cash/Online  ${record.transaction_id?'Transaction ID: '+record.transaction_id:''}\nFrom, `,{text:` ${record.stu_name.toUpperCase()} (${record.enrollment_number})\n`,bold:true},
+            ` ${record.payment_type!=='ONLINE'?'Cash':'Online'} ${record.transaction_id?'Transaction ID: '+record.transaction_id:''}\nFrom, `,{text:` ${record.stu_name.toUpperCase()} (${record.enrollment_number})\n`,bold:true},
             {text:'Contact Number:  ',bold:true},`${record.stu_contact_number}  `,{text:'Email:  ',bold:true},`${record.stu_email}\n`,
             {text:'Course:  ',bold:true},`${course.name} (${course.alias})\n`,
             {text:'Department:  ',bold:true},`${department.name} (${department.alias}) \nOn `,

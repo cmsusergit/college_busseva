@@ -40,8 +40,6 @@ declare module '$env/static/private' {
 	export const CUDA_PATH_V11_7: string;
 	export const DriverData: string;
 	export const EDITOR: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
 	export const GIT_ASKPASS: string;
 	export const GOPATH: string;
 	export const HOME: string;
@@ -129,6 +127,8 @@ declare module '$env/static/public' {
 	export const PUBLIC_TEST: string;
 	export const PUBLIC_ACCESSCODE: string;
 	export const PUBLIC_MID: string;
+	export const PUBLIC_CCAVENUE_URL: string;
+	export const PUBLIC_WEBURL: string;
 }
 
 /**
@@ -159,8 +159,6 @@ declare module '$env/dynamic/private' {
 		CUDA_PATH_V11_7: string;
 		DriverData: string;
 		EDITOR: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
 		GIT_ASKPASS: string;
 		GOPATH: string;
 		HOME: string;
@@ -253,6 +251,8 @@ declare module '$env/dynamic/public' {
 		PUBLIC_TEST: string;
 		PUBLIC_ACCESSCODE: string;
 		PUBLIC_MID: string;
+		PUBLIC_CCAVENUE_URL: string;
+		PUBLIC_WEBURL: string;
 		[key: `PUBLIC_${string}`]: string | undefined;
 	}
 }

@@ -12,6 +12,7 @@ export const actions={
     const data = Object.fromEntries(await request.formData())
     
     try {
+        console.log('****',locals.pb);
         await locals.pb
         .collection('users')
         .authWithPassword(data.email, data.password)
