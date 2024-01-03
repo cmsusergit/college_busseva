@@ -33,6 +33,8 @@ let columnList=[
         {name:'Done By',field:'done_by',selectable:true},
         {name:'Cash',field:'cash'},
         {name:'QR Code',field:'qrcode'},
+        {name:'Online',field:'online'},
+        {name:'Payment Status',selectable:true,field:'payment_status'},
         {name:'Pickup/Drop Point',field:'bus_point',searchable:true},
         {name:'Payment Date',field:'payment_date',sortable:true},
         {slot:true}
@@ -70,10 +72,10 @@ let columnList=[
             ob['qrcode']=ob.payment_type=='QRCODE'?ob.amount_paid:0.0
             ob['online']=ob.payment_type=='ONLINE'?ob.amount_paid:0.0
             ob['done_by']=ob.expand.user?.name
+            ob['payment_status']=ob['payment_status']?'DONE':'PENDING'
         })              
         getDataByDuration()
     }   
-
     const displayRecord=(record)=>{
         console.log('****',record)
         currRecord=record
@@ -108,9 +110,9 @@ let columnList=[
             <label for="to_dt" class="text-slate-800 px-1 py-1 font-bold">To Date</label>
             <input bind:value={to_dt} type="date" class="border rounded px-1 py-1 border-blue-400" name="to_dt" id="to_dt">
         </div>
+
     </div>
 </div>
-
 {#if dataTable && dataTable.length>0}
     <div class="flex justify-end">    
         <button on:click={export2excel} class="hover:bg-teal-400 bg-teal-500 px-4 py-2 text-white rounded">{loading?'Loading....':'Export Excel'}</button>
@@ -121,9 +123,13 @@ let columnList=[
                 <button on:click={()=>displayRecord(record)} class="hover:bg-teal-400 bg-teal-500 p-1 text-white rounded">                          
                     <svg width="24" height="24" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"> <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/> <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/> </svg>                                
                 </button>
-                <button on:click={()=>printReceipt(record)} class="hover:bg-green-700 bg-green-800 p-1 text-white rounded">                          
-                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12zm7-6a1 1 0 0 0 0 2h3c.34 0 .872.11 1.29.412.19.136.372.321.505.588H7.997a1 1 0 1 0 0 2h4.798a1.58 1.58 0 0 1-.504.588A2.352 2.352 0 0 1 11 12H7.997a1 1 0 0 0-.625 1.781l5.003 4a1 1 0 1 0 1.25-1.562L10.848 14h.15c.661 0 1.629-.19 2.46-.789A3.621 3.621 0 0 0 14.896 11H16a1 1 0 1 0 0-2h-1.104a3.81 3.81 0 0 0-.367-1H16a1 1 0 1 0 0-2H8z" clip-rule="evenodd"/></svg>
-                </button>
+                {#if record.payment_status!=='PENDING'}
+                    <button on:click={()=>printReceipt(record)} class="hover:bg-green-700 bg-green-800 p-1 text-white rounded">                          
+                        <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path fill="currentColor" fill-rule="evenodd" d="M1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12zm7-6a1 1 0 0 0 0 2h3c.34 0 .872.11 1.29.412.19.136.372.321.505.588H7.997a1 1 0 1 0 0 2h4.798a1.58 1.58 0 0 1-.504.588A2.352 2.352 0 0 1 11 12H7.997a1 1 0 0 0-.625 1.781l5.003 4a1 1 0 1 0 1.25-1.562L10.848 14h.15c.661 0 1.629-.19 2.46-.789A3.621 3.621 0 0 0 14.896 11H16a1 1 0 1 0 0-2h-1.104a3.81 3.81 0 0 0-.367-1H16a1 1 0 1 0 0-2H8z" clip-rule="evenodd"/></svg>
+                    </button>                                    
+                {:else}
+                    <span class="px-1 py-1 bg-orange-500 text-white text-sm rounded">PENDING</span>
+                {/if}
             </div>
         </div>
     </DataTable>

@@ -1,16 +1,18 @@
 <script> 
     import pb from '$lib/db.js'
 
-    import { Input,Alert,Button,P,Img,Radio,Spinner,Select, Label } from 'flowbite-svelte'    
+    import { Input,Alert,Button,P,Img,Radio,Spinner,Select,Modal,Label } from 'flowbite-svelte'    
     import { env } from '$env/dynamic/public'
     import { onMount } from 'svelte'
     import {invalidateAll,goto} from '$app/navigation'
     import _ from 'lodash'    
     import {receipt_print} from '$lib/reciept_print.js'
+
+    let popupModal = true;
     let loading_dept=false,loading=false
+
     export let data
     let selectedRouteRecord,orderPlaced
-
     let isRecordExist=false
     let formData = new FormData()
     let is_submitted=false
@@ -247,6 +249,8 @@ const generateReceipt=async()=>{
     <P class="text-center font-bold">Name: {feesRecord?.stu_name}</P>
     <P class="text-center font-bold">Contact: {feesRecord?.stu_contact_number}</P>
     <P class="text-center font-bold">Email: {feesRecord?.stu_email}</P>
+    <P class="text-center m-2 p-1 font-bold">Payment Receipt Number: <span class="bg-orange-500 text-white px-1 py-1 rounded">{feesRecord.id}</span></P>
+    <P class="text-center font-bold">Payment Amount: {feesRecord.amount_paid}</P>
   {#if feesRecord.payment_status==true}
     <P class="bg-slate-500 text-white p-2 text-center my-2 font-bold">Payment Already Done</P>
   {/if}
@@ -265,7 +269,7 @@ const generateReceipt=async()=>{
     <P class="text-center font-bold">Name: {feesRecord?.stu_name}</P>
     <P class="text-center font-bold">Contact: {feesRecord?.stu_contact_number}</P>
     <P class="text-center font-bold">Email: {feesRecord?.stu_email}</P>
-    <P class="text-center font-bold">Payment Receipt Number: {orderPlaced?.receipt}</P>
+    <P class="text-center font-bold">Payment Receipt Number: <span class="bg-orange-500 text-white px-1 py-1 rounded">{orderPlaced?.receipt}</span></P>
     <P class="pb-4 mb-4 text-center font-bold border-b">Payment Amount: {orderPlaced?.amount}</P>
     <Button on:click={doPayment} color="green" class="mr-2">Proceed To Payment</Button>
     <Button on:click={()=>{orderPlaced=null;invalidateAll();}} color="red">Cancel</Button>
@@ -422,4 +426,29 @@ const generateReceipt=async()=>{
     </form>  
   {/if}
 {/if}
+
+
+
+<Modal bind:open={popupModal} size="xs" autoclose>
+  <div class="text-justify p-2">
+    <h4 class="m-2 text-lg  text-gray-500 dark:text-gray-400 font-bold border-b text-center">Read This Before You Proceed</h4>
+    <p>
+      Do not exit the page or refresh the page while processing the payment to avoid any transaction issues.
+    </p>
+    <p>
+      After the payment is successfully made, you will be automatically redirected to a page to download your payment receipt.
+      <br>
+    </p>
+    <p>
+      Please, Also Note Down <span class="font-bold underline">Payment Receipt Number</span> Before Proceeding to Payment in case of any issue.
+    </p>
+    <p>
+      Click on the <b>"Download Receipt"</b> button to obtain a copy of your payment receipt for your records.
+    </p>
+    <div class="m-2 border-t"></div>
+    <Button color="red">Close</Button>
+  </div>
+</Modal>
+
+
 

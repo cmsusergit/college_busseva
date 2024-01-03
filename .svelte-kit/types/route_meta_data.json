@@ -12,6 +12,9 @@
 	"/api/payment": [
 		"src/routes/api/payment/+server.js"
 	],
+	"/api/status_payment": [
+		"src/routes/api/status_payment/+server.js"
+	],
 	"/auth/login": [
 		"src/routes/auth/login/+page.js",
 		"src/routes/auth/login/+page.server.js",
