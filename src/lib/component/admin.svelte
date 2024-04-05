@@ -62,7 +62,7 @@ let columnList=[
         //....
     }
     const processData=(dt)=>{
-        dataTableInit=_.forEach(dt,(ob)=>{              
+        dataTableInit=_.forEach(dt,(ob)=>{       
             ob['traveller']=ob.expand.route.expand.traveller.name
             ob['department']=ob.expand.department?.name
             ob['course']=ob.expand.course?.name
@@ -87,12 +87,16 @@ let columnList=[
     const export2excel=()=>{
         loading=true
         let list1=new Array() 
-        dataTable.map(ob=>{         
-                let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","done_by"])
-                list1.push(temp)
+	    let count=0
+        dataTable.map(ob=>{   			
+                if(ob.payment_status=="DONE"){
+                    let temp=_.pick(ob,["id","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","payment_status","done_by"])
+                    list1.push(temp)
+				count=count+1
+                }
         })
-
-        list1=_.orderBy(list1,["payment_date","receipt_number"],['asc','asc'])
+	console.log('****',count)
+        list1=_.orderBy(list1,["payment_date"],['desc'])
         const wsheet=XLSX.utils.json_to_sheet(list1)
         const wb=XLSX.utils.book_new()            
         XLSX.utils.book_append_sheet(wb,wsheet,"report")

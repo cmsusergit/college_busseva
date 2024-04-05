@@ -6,11 +6,12 @@ import _ from 'lodash'
 
 export const receipt_print=async (id)=>{            
     const record = await pb.collection('bus_fees').getOne(id, {
+
         expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',
     });
     const ayear=record.expand.academic_year
-    const route=record.expand.route
 
+    const route=record.expand.route
     const course=record.expand.course
     const buspoint=record.expand.bus_point
     const department=record.expand.department
@@ -37,7 +38,7 @@ export const receipt_print=async (id)=>{
 
 
 
-            {text:`Receipt Number: ${record.id}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
+            {text:`Receipt Number: ${record.id}\nDate: ${new Date(record.payment_date).toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
             {table:{body:[[{image:'photo',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'}
         ]
     }

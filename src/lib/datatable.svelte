@@ -71,12 +71,13 @@
         }
     }
 </script>
-<div>
+<div>        
     {#if data.length<=0}
         <div class="text-2xl text-orange-700 text-center bg-slate-50 p-2">
             Data Table is Empty
         </div>
     {:else}
+        <div class="w-full bg-blue-500 text-center text-white font-bold m-2 rounded p-2">{dataTable.length}</div>
         <div class="my-4 py-2 px-4 border border-slate-200 w-full flex justify-end items-center">   
             <div class="px-4 font-bold">Page {currPage} / {totalPage}</div>
             <button disabled={currPage==1} on:click={()=>{currPage=currPage-1;currPage=currPage<1?1:currPage}} class="px-2 py-2 mr-2 bg-blue-500 text-white hover:bg-blue-400 shadow shadow-gray-400 rounded w-24 disabled:bg-gray-400">
@@ -141,12 +142,6 @@
                 {/each}  
             </table>
         </div>
-
-
-
-
-
-        
         <div class="my-4 py-2 px-4 border border-slate-200 w-full flex justify-end items-center">
             <div class="px-4 font-bold">Page {currPage} / {totalPage}</div>
             <button disabled={currPage==1} on:click={()=>{currPage=currPage-1;currPage=currPage<1?1:currPage}} class="px-2 py-2 mr-2 bg-blue-500 text-white hover:bg-blue-400 shadow shadow-gray-400 rounded w-24 disabled:bg-gray-400">
@@ -158,4 +153,3 @@
         </div>
     {/if}
 </div>
-

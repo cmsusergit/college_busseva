@@ -7,10 +7,11 @@
     let profileRecord={}
     onMount(()=>{
         profileRecord['Receipt Number']=profile['receipt_number']
+        profileRecord['Payment Receipt Number']=profile['id']
         profileRecord['Amount Paid']=profile['amount_paid']
         profileRecord['Payment Date']=profile['payment_date']
-        profileRecord['Student Name']=profile['stu_name']
 
+        profileRecord['Student Name']=profile['stu_name']
         profileRecord['Student Contact']=profile['stu_contact_number']
         profileRecord['Student Email']=profile['stu_email']
         profileRecord['Parent Contact']=profile['parent_contact_number']

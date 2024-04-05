@@ -61,11 +61,13 @@
     }
     const fetchRecordWithEmail=async()=>{
       try{
-        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}"`)
+        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}"`,{expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',})
         if(record){
           isRecordExist=true
           fetchDepartmentList(record.course)
           feesRecord=JSON.parse(JSON.stringify(record))
+          selectedRouteRecord=record.expand.route
+          console.log(feesRecord);
         }
       }catch(error1){
         console.log('****',error1)
@@ -161,6 +163,12 @@
   }
   const doPayment=async()=>{
     loading=true
+
+
+
+
+
+
         try{
           const requestRecord={
             merchant_id:env.PUBLIC_MID,
@@ -170,6 +178,7 @@
             redirect_url:'https://college-busseva.vercel.app/api/ccAvenueResponse', 
             cancel_url:'https://college-busseva.vercel.app/api/ccAvenueResponse',
             language:'EN',            
+            traveller_name:selectedRouteRecord?.expand?.traveller?.name,
             billing_name:feesRecord.stu_name,
             billing_address:'Vasad',
             billing_city:'Vasad',
@@ -177,7 +186,7 @@
             billing_zip:'388306',
             billing_country:'India',
             billing_tel:feesRecord.stu_contact_number,
-            billing_email:feesRecord.stu_email            
+            billing_email:feesRecord.stu_email,                        
           }
           fetch('/api/payment', {
               method: 'POST',
@@ -392,16 +401,16 @@ const generateReceipt=async()=>{
           <div>
             <Label class="mb-2 text-lg">Payement Amount</Label>
             <Input bind:value={feesRecord.amount_total} disabled></Input>
-
           </div>
           {#if data?.profile}
             <div>
               <Label class="mb-2 text-lg">Payment Method</Label>
               <div class="grid grid-cols-{2+1} w-full md:w-full">
-                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="CASH" class="w-full p-4">CASH</Radio>
-                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="QRCODE" class="w-full p-4">QR Code</Radio>
+                <!-- <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="CASH" class="w-full p-4">CASH</Radio>
+                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="QRCODE" class="w-full p-4">QR Code</Radio> -->
                 <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="ONLINE" class="w-full p-4">ONLINE</Radio>
               </div>
+
             </div>      
           {/if}
         </div>        

@@ -11,6 +11,7 @@ export const POST=async(event) =>{
         let requestDt=''
         for (const ob in dt) {
 
+            console.log('&&&&',ob,'&&&&',dt[ob]);
             requestDt+=`${ob}=${dt[ob]}&`
         }        
         const sub_account_id='NESTFEE2023'
