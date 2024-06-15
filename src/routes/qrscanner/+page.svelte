@@ -19,7 +19,7 @@
     }
     const fetchDt1=async(text)=>{
         try{
-            let currRecord = await db.collection('bus_fees').getOne(text, {
+            currRecord = await db.collection('bus_fees').getOne(text, {
                 expand:'user,course,department,route,bus_point,route.traveller',    
             });  
             currRecord['traveller']=currRecord.expand.route.expand.traveller.name
