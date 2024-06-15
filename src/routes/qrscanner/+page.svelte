@@ -22,7 +22,6 @@
     }
     const onScanFailure=(error)=>{
         console.log('****',error)
-        alert(error)
     }
     let config = {
         fps: 10,
