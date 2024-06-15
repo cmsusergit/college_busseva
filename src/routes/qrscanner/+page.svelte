@@ -8,15 +8,14 @@
     let currRecord
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
-            alert('****',decodedResult)
-            const decryptedText=CryptoJS.AES.decrypt(decodedResult,"ihavesecret").toString(CryptoJS.enc.Utf8)
+            alert('****',decodedText.toString())
+            const decryptedText=CryptoJS.AES.decrypt(decodedText.toString(),"ihavesecret").toString(CryptoJS.enc.Utf8)
 
+            alert('----',decryptedText)
             currRecord = await pb.collection('bus_fees').getOne(decryptedText, {
                 expand:'user,course,department,route,bus_point,route.traveller'
-            });
-            alert('----',JSON.stringify(currRecord))
+            });            
         } catch (error) {            
-
             console.log('****',error)
         }
     }
