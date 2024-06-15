@@ -14,10 +14,10 @@
             alert('****',decodedText)
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
             text=decryptedText
-            await html5QrCode.stop()
             let currRecord = await db.collection('bus_fees').getOne(text, {
                 expand:'user,course,department,route,bus_point,route.traveller',    
-            });            
+            });  
+            alert(`----${JSON.stringify(currRecord)}----`)          
             currRecord['traveller']=currRecord.expand.route.expand.traveller.name
             currRecord['department']=currRecord.expand.department?.name
             currRecord['course']=currRecord.expand.course?.name
