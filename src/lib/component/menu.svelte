@@ -52,6 +52,7 @@
             <NavUl {hidden}>
                 <NavLi class="text-lg" href="/dashboard" active={$page.route.id=='/dashboard'}>Home</NavLi>                
                 <NavLi class="text-lg" href="/" active={$page.route.id=='/'}>Form</NavLi>
+                <NavLi class="text-lg" href="/qrscanner" active={$page.route.id=='qrscanner'}>QR scanner</NavLi>
                 {#if is_auth.role=='ADMIN'}
                     <NavLi class="text-lg cursor-pointer" id="nav-menu1"><Chevron aligned>Manage</Chevron></NavLi>
                     <Dropdown triggeredBy="#nav-menu1" class="w-44 z-20">

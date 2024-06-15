@@ -41,6 +41,11 @@
 		"src/routes/+layout.js",
 		"src/routes/+layout.server.js"
 	],
+	"/qrscanner": [
+		"src/routes/qrscanner/+page.js",
+		"src/routes/+layout.js",
+		"src/routes/+layout.server.js"
+	],
 	"/response": [
 		"src/routes/response/+page.js",
 		"src/routes/+layout.js",
