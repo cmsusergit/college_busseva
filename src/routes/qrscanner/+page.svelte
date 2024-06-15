@@ -7,11 +7,15 @@
     import Profile from '../../lib/component/profile.svelte'
     let currRecord,text='test'
 
+    let html5QrcodeScanner
+
+
+
     const onScanSuccess=(decodedText, decodedResult)=>{
             console.log('****',decodedResult.toString(),'****',decodedText)
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
-
             text=decryptedText
+            html5QrcodeScanner.clear()
             fetchDt1(text)
     }
     const fetchDt1=async(text)=>{
@@ -44,7 +48,7 @@
     };
     onMount(()=>{
         console.log('****');
-        let html5QrcodeScanner = new Html5QrcodeScanner("reader", config,false);
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", config,false);
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);        
 })
     const onchange=(ee)=>{        
