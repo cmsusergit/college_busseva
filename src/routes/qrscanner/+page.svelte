@@ -8,8 +8,8 @@
     let currRecord
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
-            console.log(`Code matched = ${decodedText}`, decodedResult);        
-            alert('****',decodedResult)
+            alert(`Code matched = ${decodedText}`, decodedResult);        
+            alert('****',decodedText)
 
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
             console.log('$$$$',decryptedText);
