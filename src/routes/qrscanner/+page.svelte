@@ -5,26 +5,27 @@
     import * as CryptoJS from 'crypto-js';
     import { onMount } from 'svelte';
     import Profile from '../../lib/component/profile.svelte'
-    let currRecord
+    let currRecord,text='test'
 
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
             console.log('****',decodedResult.toString(),'****',decodedText)
 
             const decryptedText=CryptoJS.AES.decrypt(decodedResult,"ihavesecret").toString(CryptoJS.enc.Utf8)
-            let currRecord = await db.collection('bus_fees').getOne(decryptedText, {
-                expand:'user,course,department,route,bus_point,route.traveller',    
-            });            
-            currRecord['traveller']=currRecord.expand.route.expand.traveller.name
-            currRecord['department']=currRecord.expand.department?.name
-            currRecord['course']=currRecord.expand.course?.name
-            currRecord['bus_point']=currRecord.expand.bus_point?.name
-            currRecord['payment_date']=new Date(currRecord.payment_date).toLocaleDateString()
-            currRecord['cash']=currRecord.payment_type=='CASH'?currRecord.amount_paid:0.0
-            currRecord['qrcode']=currRecord.payment_type=='QRCODE'?currRecord.amount_paid:0.0
-            currRecord['online']=currRecord.payment_type=='ONLINE'?currRecord.amount_paid:0.0
-            currRecord['done_by']=currRecord.expand.user?.name
-            currRecord['payment_status']=currRecord['payment_status']?'DONE':'PENDING'
+            text=decryptedText
+            // let currRecord = await db.collection('bus_fees').getOne(decryptedText, {
+            //     expand:'user,course,department,route,bus_point,route.traveller',    
+            // });            
+            // currRecord['traveller']=currRecord.expand.route.expand.traveller.name
+            // currRecord['department']=currRecord.expand.department?.name
+            // currRecord['course']=currRecord.expand.course?.name
+            // currRecord['bus_point']=currRecord.expand.bus_point?.name
+            // currRecord['payment_date']=new Date(currRecord.payment_date).toLocaleDateString()
+            // currRecord['cash']=currRecord.payment_type=='CASH'?currRecord.amount_paid:0.0
+            // currRecord['qrcode']=currRecord.payment_type=='QRCODE'?currRecord.amount_paid:0.0
+            // currRecord['online']=currRecord.payment_type=='ONLINE'?currRecord.amount_paid:0.0
+            // currRecord['done_by']=currRecord.expand.user?.name
+            // currRecord['payment_status']=currRecord['payment_status']?'DONE':'PENDING'
         } catch (error) {            
             console.log('****',error)
         }
@@ -69,12 +70,13 @@
     }
 </script>
 <div>
+
+    {text}
     {#if !currRecord}
-    <div id="reader"/>
+    <div id="reader" width="800"/>
     <input on:change={onchange} type="file" name="" id="">
     {:else}
         <div>
-
             <Profile profile={currRecord}></Profile>  
         </div>
     {/if}
