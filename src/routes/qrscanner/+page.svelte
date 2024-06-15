@@ -39,6 +39,7 @@
 
 <div>
     <div id="reader"/>
+    {JSON.stringify(currRecord)}
     {#if currRecord}
         <div>
             <Profile :profileRecord={currRecord}></Profile>  
