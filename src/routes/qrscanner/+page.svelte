@@ -6,13 +6,13 @@
     import { onMount } from 'svelte';
     import Profile from '../../lib/component/profile.svelte'
     let currRecord
+
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
-            alert('****',decodedResult.toString(),'****',decodedText)
-            const decryptedText=CryptoJS.AES.decrypt(decodedResult.toString(),"ihavesecret").toString(CryptoJS.enc.Utf8)
+            console.log('****',decodedResult.toString(),'****',decodedText)
 
-            alert('----',decryptedText)
-            let currRecord = db.collection('bus_fees').getOne(decryptedText, {
+            const decryptedText=CryptoJS.AES.decrypt(decodedResult,"ihavesecret").toString(CryptoJS.enc.Utf8)
+            let currRecord = await db.collection('bus_fees').getOne(decryptedText, {
                 expand:'user,course,department,route,bus_point,route.traveller',    
             });            
             currRecord['traveller']=currRecord.expand.route.expand.traveller.name
@@ -79,6 +79,9 @@
         </div>
     {/if}
 </div>
+
+
+
 
 
 
