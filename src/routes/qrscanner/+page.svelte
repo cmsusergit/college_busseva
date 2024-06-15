@@ -9,7 +9,7 @@
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
             console.log(`Code matched = ${decodedText}`, decodedResult);        
-            alert(decodedResult)
+            alert('****',decodedResult)
 
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
             console.log('$$$$',decryptedText);
@@ -39,8 +39,10 @@
 
 <div>
     <div id="reader"/>
-    {JSON.stringify(currRecord)}
+
+
     {#if currRecord}
+        {JSON.stringify(currRecord)}
         <div>
             <Profile :profileRecord={currRecord}></Profile>  
         </div>
