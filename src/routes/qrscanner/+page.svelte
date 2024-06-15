@@ -76,13 +76,12 @@
     }
 </script>
 <div>
-    {text}
     {#if !currRecord}
         <div id="reader" width="800"/>
-        <input on:change={onchange} type="file" name="" id="">
+        <!-- <input on:change={onchange} type="file" name="" id=""> 
+        -->
     {:else}
         <div>
-            ----{JSON.stringify(currRecord)}----
             <Profile profile={currRecord}></Profile>  
         </div>
     {/if}
