@@ -4,7 +4,7 @@
     import {Html5QrcodeScanner,Html5QrcodeScanType} from "html5-qrcode"
     import * as CryptoJS from 'crypto-js';
     import { onMount } from 'svelte';
-    import Profile from '$lib/component/profile.svelete'
+    import Profile from '../../lib/component/profile.svelte'
     let currRecord
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
