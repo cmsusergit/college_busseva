@@ -5,18 +5,17 @@
     import * as CryptoJS from 'crypto-js';
     import { onMount } from 'svelte';
     import Profile from '../../lib/component/profile.svelte'
-    let currRecord,text='test'
-
+    let currRecord,text
     let html5QrcodeScanner
-
-
+    $:{
+        if(text) fetchDt1(text)
+    }
 
     const onScanSuccess=(decodedText, decodedResult)=>{
             console.log('****',decodedResult.toString(),'****',decodedText)
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
             text=decryptedText
-            html5QrcodeScanner.clear()
-            fetchDt1(text)
+            html5QrcodeScanner.clear()          
     }
     const fetchDt1=async(text)=>{
         try{
