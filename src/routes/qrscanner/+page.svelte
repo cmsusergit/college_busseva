@@ -11,7 +11,7 @@
             alert(`Code matched = ${decodedText}`, decodedResult);        
             alert('****',decodedText)
 
-            const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
+            const decryptedText=CryptoJS.AES.decrypt(decodedResult,"ihavesecret").toString(CryptoJS.enc.Utf8)
             console.log('$$$$',decryptedText);
             currRecord = await pb.collection('bus_fees').getOne(decryptedText, {
                 expand:'user,course,department,route,bus_point,route.traveller'
