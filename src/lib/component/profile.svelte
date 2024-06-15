@@ -27,7 +27,7 @@
 </script>     
 <div class="overflow-auto p-2">    
     <div class="flex justify-center w-full p-2">
-        <img src={pb.files.getUrl(profile,profile.photo)} alt="" width="140" height="140">
+        <img src={pb.files.getUrl(profile,profile?.photo)} alt="" width="140" height="140">
     </div>
     <Table>         
         <TableBody>                    
