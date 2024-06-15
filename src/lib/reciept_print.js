@@ -20,7 +20,6 @@ export const receipt_print=async (id)=>{
     const imageurl=pb.files.getUrl(record,record.photo)
     let qrcodeUrl=''
     const encryptedText=CryptoJS.AES.encrypt(record.id,"ihavesecret").toString()
-    console.log('$$$$',encryptedText)    
     let opts = {
         errorCorrectionLevel: 'H',
         type: 'image/jpeg',
@@ -29,8 +28,16 @@ export const receipt_print=async (id)=>{
         if (err) throw err
         qrcodeUrl=url        
     })    
-    const decryptedText=CryptoJS.AES.decrypt(encryptedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
-    console.log('$$$$',decryptedText);
+
+
+
+
+
+
+
+
+
+    
     const reportHeading={
         margin:[2,2,2,2],bold:true,
         alignment:'center',
