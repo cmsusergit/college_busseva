@@ -9,10 +9,10 @@
     const onScanSuccess=async(decodedText, decodedResult)=>{
         try {                    
             console.log(`Code matched = ${decodedText}`, decodedResult);        
-            const decryptedText=CryptoJS.AES.decrypt(encryptedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
+            alert(decodedResult)
 
+            const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
             console.log('$$$$',decryptedText);
-            alert(decryptedText)
             currRecord = await pb.collection('bus_fees').getOne(decryptedText, {
                 expand:'user,course,department,route,bus_point,route.traveller'
             });
