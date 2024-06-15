@@ -7,17 +7,18 @@
     import Profile from '../../lib/component/profile.svelte'
     let currRecord,text='test'
 
-    const onScanSuccess=async(decodedText, decodedResult)=>{
-        try {                    
+    const onScanSuccess=(decodedText, decodedResult)=>{
             console.log('****',decodedResult.toString(),'****',decodedText)
-
-            alert('****',decodedText)
             const decryptedText=CryptoJS.AES.decrypt(decodedText,"ihavesecret").toString(CryptoJS.enc.Utf8)
+
             text=decryptedText
+            fetchDt1(text)
+    }
+    const fetchDt1=async(text)=>{
+        try{
             let currRecord = await db.collection('bus_fees').getOne(text, {
                 expand:'user,course,department,route,bus_point,route.traveller',    
             });  
-            alert(`----${JSON.stringify(currRecord)}----`)          
             currRecord['traveller']=currRecord.expand.route.expand.traveller.name
             currRecord['department']=currRecord.expand.department?.name
             currRecord['course']=currRecord.expand.course?.name
