@@ -61,7 +61,15 @@
     }
     const fetchRecordWithEmail=async()=>{
       try{
-        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}"`,{expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',})
+
+
+
+
+
+        
+        console.log('$$$$',feesRecord.academic_year);
+        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}" && academic_year="${feesRecord.academic_year}" `,{expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',})
+        console.log(record);
         if(record){
           isRecordExist=true
           fetchDepartmentList(record.course)

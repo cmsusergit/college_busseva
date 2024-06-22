@@ -8,7 +8,7 @@
     import Profile from '../../lib/component/profile.svelte'
     let currRecord,text
     let html5QrcodeScanner,enrollment
-    let error_mesg
+    let error_mesg,curr_ayear
 
 
     $:{
@@ -22,7 +22,7 @@
     }
     const fetchDt1=async(text)=>{
         try{
-            currRecord = await db.collection('bus_fees').getOne(text, {
+            currRecord = await db.collection('bus_fees').getFirstListItem(`id="${text}" && academic_year="${curr_ayear}" `, {
                 expand:'user,course,department,route,bus_point,route.traveller',    
             });  
             currRecord['traveller']=currRecord.expand.route.expand.traveller.name
@@ -50,15 +50,24 @@
         rememberLastUsedCamera: true,
         supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
     };
-    onMount(()=>{
+    onMount(async()=>{
         console.log('****');
+        try{
+            const curr_ayear1=await db.collection('academic_year').getFirstListItem("is_active=True")
+            curr_ayear=curr_ayear1.id
+        }catch(error){
+            console.log('****',error)
+        }
         html5QrcodeScanner = new Html5QrcodeScanner("reader", config,false);
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);        
 })
 
 const onsubmit=async(ee)=>{        
         try{
-            const text1=`enrollment_number="${enrollment}"`
+
+
+
+            const text1=`enrollment_number="${enrollment}" && academic_year="${curr_ayear}" `
             currRecord = await db.collection('bus_fees').getFirstListItem(text1, {
                 expand:'user,course,department,route,bus_point,route.traveller'
             });         
