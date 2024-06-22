@@ -224,7 +224,6 @@ const onFileChange=async()=>{
     for (let file of fileInput.files) {
       feesRecord.photo=file.name
       const reader = new FileReader();
-
       if(file.size>=2097152){
         error_mesg='Photo Size must be less then 2MB'
         window.scrollTo(0,0)
@@ -237,7 +236,6 @@ const onFileChange=async()=>{
       formData.append('photo', file)
     }  
 }
-
 
 const generateReceipt=async()=>{  
   console.log('----',feesRecord)
@@ -331,8 +329,8 @@ const generateReceipt=async()=>{
           {#if feesRecord?.photo}
             <img class="w-48 h-48" src={feesRecord.photo} alt=""/>
           {/if}
-          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB)</span></Label>
-          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput" required></Input>
+          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB,Formats Supported "jpeg/png")</span></Label>
+          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput"  accept="image/jpeg,image/x-png" required></Input>
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-{2+1}">
           <div>
@@ -410,9 +408,9 @@ const generateReceipt=async()=>{
                 <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="QRCODE" class="w-full p-4">QR Code</Radio> -->
                 <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="ONLINE" class="w-full p-4">ONLINE</Radio>
               </div>
-
             </div>      
-          {/if}
+
+            {/if}
         </div>        
         {#if feesRecord.payment_type=='QRCODE'}
         <div class="w-full flex justify-center border">
@@ -435,7 +433,6 @@ const generateReceipt=async()=>{
     </form>  
   {/if}
 {/if}
-
 
 
 <Modal bind:open={popupModal} size="xs" autoclose>
