@@ -8,7 +8,7 @@
     import Profile from '../../lib/component/profile.svelte'
     let currRecord,text
     let html5QrcodeScanner,enrollment
-
+    let error_mesg
 
 
     $:{
@@ -35,8 +35,10 @@
             currRecord['online']=currRecord.payment_type=='ONLINE'?currRecord.amount_paid:0.0
             currRecord['done_by']=currRecord.expand.user?.name
             currRecord['payment_status']=currRecord['payment_status']?'DONE':'PENDING'
+            error_mesg=null
         } catch (error) {            
             console.log('****',error)
+            error_mesg="Record Not Found in DB"
         }
     }
     const onScanFailure=(error)=>{
@@ -73,10 +75,16 @@ const onsubmit=async(ee)=>{
         }
         catch(error){
                 console.log(`Error scanning file. Reason: ${error}`)
+                error_mesg="Record Not Found in DB"
         }
     }
 </script>
 <div>
+        {#if error_mesg}
+        <div class="text-4xl bg-orange-700 text-center text-white p-4">             
+            {error_mesg}
+        </div>
+        {/if}
     {#if !currRecord}
         <div id="reader" width="800"/>
         <form on:submit|preventDefault={onsubmit} class="mt-4 border">
@@ -88,15 +96,6 @@ const onsubmit=async(ee)=>{
         </form>
     {:else}
         <div>
-
-
-
-
-
-
-
-
-
         <button on:click={()=>{currRecord='';text='';goto('/qrscanner');}} class="justify-self-end bg-blue-700 text-white float-right px-4 py-2 hover:bg-blue-800 font-bold">Goto SCANNER</button>
             <div class="p-2 float-none"></div>
             {#if currRecord.payment_status=="DONE"}

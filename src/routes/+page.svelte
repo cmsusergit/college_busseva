@@ -163,12 +163,6 @@
   }
   const doPayment=async()=>{
     loading=true
-
-
-
-
-
-
         try{
           const requestRecord={
             merchant_id:env.PUBLIC_MID,
@@ -433,8 +427,6 @@ const generateReceipt=async()=>{
     </form>  
   {/if}
 {/if}
-
-
 <Modal bind:open={popupModal} size="xs" autoclose>
   <div class="text-justify p-2">
     <h4 class="m-2 text-lg  text-gray-500 dark:text-gray-400 font-bold border-b text-center">Read This Before You Proceed</h4>
@@ -448,6 +440,7 @@ const generateReceipt=async()=>{
     <p>
       Please, Also Note Down <span class="font-bold underline">Payment Receipt Number</span> Before Proceeding to Payment in case of any issue.
     </p>
+
     <p>
       Click on the <b>"Download Receipt"</b> button to obtain a copy of your payment receipt for your records.
     </p>
@@ -455,6 +448,3 @@ const generateReceipt=async()=>{
     <Button color="red">Close</Button>
   </div>
 </Modal>
-
-
-
