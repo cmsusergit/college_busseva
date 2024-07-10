@@ -61,12 +61,6 @@
     }
     const fetchRecordWithEmail=async()=>{
       try{
-
-
-
-
-
-        
         console.log('$$$$',feesRecord.academic_year);
         const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}" && academic_year="${feesRecord.academic_year}" `,{expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',})
         console.log(record);

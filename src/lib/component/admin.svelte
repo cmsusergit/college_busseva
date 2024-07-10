@@ -21,10 +21,7 @@ const convertToDtstring = (dt)=>{
             day = '0' + day;
         return [year, month, day].join('-');
 }
-$:if(from_dt && to_dt){
-    getDataByDuration()
-}
-let from_dt=convertToDtstring(new Date()),to_dt=convertToDtstring(new Date())
+let from_dt,to_dt
 let columnList=[
         {name:'Student Name',field:'stu_name',searchable:true,sortable:true},
         {name:'Enrollment/ID Number',field:'enrollment_number',searchable:true,sortable:true},
@@ -39,30 +36,46 @@ let columnList=[
         {name:'Payment Date',field:'payment_date',sortable:true},
         {slot:true}
     ]    
+
     onMount(async()=>{
-        const dt = await pb.collection('bus_fees').getFullList({
-            expand:'user,course,department,route,bus_point,route.traveller',            
-            sort:'-created'
-        })
-        processData(dt)
+        from_dt=new Date().toISOString().split('T')[0]
+        let temp1=new Date()
+        temp1.setDate(temp1.getDate()+1)
+        to_dt=new Date(temp1).toISOString().split('T')[0]
+        getDataByDuration()
     })
-    const getDataByDuration=()=>{
-        console.log(from_dt)
-        const tbl1=dataTableInit.filter(ob=>{
-            const temp_pd=new Date(ob.payment_date)              
-            temp_pd.setHours(0,0,0,0)
-            const temp_fd=new Date(from_dt)
-            const temp_td=new Date(to_dt)
-            temp_fd.setHours(0,0,0,0)
-            temp_td.setHours(0,0,0,0)            
-            return (temp_pd>=temp_fd && temp_pd <= temp_td)
-        })
-        dataTable=[...tbl1]
-        //....
-        //....
+    const getDataByDuration=async()=>{
+        loading=true
+        console.log(from_dt,to_dt);
+        try {            
+            const dt = await pb.collection('bus_fees').getFullList({
+                expand:'user,course,department,route,bus_point,route.traveller',            
+                filter:`payment_date >= "${from_dt}" && payment_date <= "${to_dt}" `,
+                sort:'-created'
+            })
+            processData(dt)            
+        } catch (error) {            
+            console.log('****',error)
+        }
+        finally{
+            loading=false
+        }
+        // console.log(from_dt)
+        // const tbl1=dataTableInit.filter(ob=>{
+        //     const temp_pd=new Date(ob.payment_date)              
+        //     temp_pd.setHours(0,0,0,0)
+        //     const temp_fd=new Date(from_dt)
+        //     const temp_td=new Date(to_dt)
+        //     temp_fd.setHours(0,0,0,0)
+        //     temp_td.setHours(0,0,0,0)            
+        //     return (temp_pd>=temp_fd && temp_pd <= temp_td)
+        // })
+        // dataTable=[...tbl1]
+        // //....
+        // //....
     }
     const processData=(dt)=>{
-        dataTableInit=_.forEach(dt,(ob)=>{       
+        dataTable=_.forEach(dt,(ob)=>{       
             ob['traveller']=ob.expand.route.expand.traveller.name
             ob['department']=ob.expand.department?.name
             ob['course']=ob.expand.course?.name
@@ -74,7 +87,6 @@ let columnList=[
             ob['done_by']=ob.expand.user?.name
             ob['payment_status']=ob['payment_status']?'DONE':'PENDING'
         })              
-        getDataByDuration()
     }   
     const displayRecord=(record)=>{
         console.log('****',record)
@@ -95,15 +107,18 @@ let columnList=[
 				count=count+1
                 }
         })
-	console.log('****',count)
+        console.log('****',count)
         list1=_.orderBy(list1,["payment_date"],['desc'])
         const wsheet=XLSX.utils.json_to_sheet(list1)
         const wb=XLSX.utils.book_new()            
         XLSX.utils.book_append_sheet(wb,wsheet,"report")
         XLSX.writeFile(wb,"report.xlsx")
         loading=false
-    }
+
+
+}
 </script>
+
 <div class="mb-4 border">
     <div  class="flex md:flex-row flex-col">
         <div class="flex flex-col w-full md:w-1/2 m-1 px-1">
@@ -114,9 +129,17 @@ let columnList=[
             <label for="to_dt" class="text-slate-800 px-1 py-1 font-bold">To Date</label>
             <input bind:value={to_dt} type="date" class="border rounded px-1 py-1 border-blue-400" name="to_dt" id="to_dt">
         </div>
-
+    </div>
+    <div class="justify-end flex">
+        <button on:click={getDataByDuration} class="uppercase border px-4 py-2 w-full md:w-1/4 bg-blue-700 hover:bg-blue-800 text-white">fetch</button>
     </div>
 </div>
+
+
+
+{#if loading}
+    <p class="text-2xl text-orange-700 p-2  text-center font-bold">Loading....</p>
+{/if}
 {#if dataTable && dataTable.length>0}
     <div class="flex justify-end">    
         <button on:click={export2excel} class="hover:bg-teal-400 bg-teal-500 px-4 py-2 text-white rounded">{loading?'Loading....':'Export Excel'}</button>

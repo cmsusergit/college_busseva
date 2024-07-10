@@ -61,12 +61,8 @@
         html5QrcodeScanner = new Html5QrcodeScanner("reader", config,false);
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);        
 })
-
 const onsubmit=async(ee)=>{        
         try{
-
-
-
             const text1=`enrollment_number="${enrollment}" && academic_year="${curr_ayear}" `
             currRecord = await db.collection('bus_fees').getFirstListItem(text1, {
                 expand:'user,course,department,route,bus_point,route.traveller'
@@ -81,6 +77,7 @@ const onsubmit=async(ee)=>{
             currRecord['online']=currRecord.payment_type=='ONLINE'?currRecord.amount_paid:0.0
             currRecord['done_by']=currRecord.expand.user?.name
             currRecord['payment_status']=currRecord['payment_status']?'DONE':'PENDING'
+            error_mesg=null
         }
         catch(error){
                 console.log(`Error scanning file. Reason: ${error}`)
@@ -113,5 +110,7 @@ const onsubmit=async(ee)=>{
                 <h1 class="p-2 text-2xl text-orange-700 text-center">Payment Status: Not Done</h1>
             {/if}
         </div>
+
     {/if}
 </div>
+
