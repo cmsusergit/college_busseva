@@ -1,4 +1,4 @@
-<script>
+<script>  
     import pb from '$lib/db'
     
     import DataTable from '$lib/datatable.svelte'
