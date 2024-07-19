@@ -115,8 +115,6 @@
         try{
           receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
         }catch(error1){
-        
-        
             if(!receipt_record){
             const temp1 = {
                 "number": 1,
@@ -338,8 +336,14 @@ const generateReceipt=async()=>{
                 </span> 
               </Label>
               <Select on:change={(event)=>fetchDepartmentList(event.target.value)} bind:value={feesRecord.course} id="course" required>
+              
                 {#each data?.courseList as course}          
-                  <option value={course.id} >{course.name}</option>
+                  {#if data?.profile && course.name=='ACPC'}
+                    <option value={course.id} >{course.name}</option>
+                  {:else if course.name!=='ACPC'}
+                    <option value={course.id}>{course.name}</option>
+                  {/if}
+
                 {/each}
               </Select>   
           </div>
