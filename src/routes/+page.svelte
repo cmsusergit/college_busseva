@@ -33,7 +33,7 @@
       "amount_total": 0.0,
       "payment_status":false,
       "payment_date": new Date(),      
-      "payment_type":data?.profile?"CASH":"ONLINE",
+      "payment_type":"ONLINE",
       "academic_year": data?.ayearList?.find(ob=>ob.is_active==true)?.id??0,
       "user": data?.profile?.id??''
     }
