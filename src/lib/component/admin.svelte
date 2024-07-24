@@ -119,7 +119,7 @@ let columnList=[
                 if(ob.payment_status=="DONE"){
                     let temp=_.pick(ob,["id","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","payment_status","done_by"])
                     list1.push(temp)
-				count=count+1
+                    count=count+1
                 }
         })
         console.log('****',count)

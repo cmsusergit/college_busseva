@@ -97,9 +97,11 @@
         const export2excel=()=>{
             loading=true
             let list1=new Array() 
-            dataTable.map(ob=>{            
-                    let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","done_by"])
-                    list1.push(temp)
+            dataTable.map(ob=>{       
+                    if(ob.payment_status==true)     {
+                        let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","payment_status","done_by"])
+                        list1.push(temp)
+                    }
             })
             const wsheet=XLSX.utils.json_to_sheet(list1)
             const wb=XLSX.utils.book_new()            
@@ -108,6 +110,7 @@
             loading=false
         }
     </script>
+
     {#if loading}
         <p class="text-4xl text-center">Loading....</p>
     {/if}
