@@ -1,16 +1,18 @@
 <script> 
     import pb from '$lib/db.js'
 
-    import { Input,Alert,Button,P,Img,Radio,Spinner,Select, Label } from 'flowbite-svelte'    
+    import { Input,Alert,Button,P,Img,Radio,Spinner,Select,Modal,Label } from 'flowbite-svelte'    
     import { env } from '$env/dynamic/public'
     import { onMount } from 'svelte'
     import {invalidateAll,goto} from '$app/navigation'
     import _ from 'lodash'    
     import {receipt_print} from '$lib/reciept_print.js'
+
+    let popupModal = true;
     let loading_dept=false,loading=false
+
     export let data
     let selectedRouteRecord,orderPlaced
-
     let isRecordExist=false
     let formData = new FormData()
     let is_submitted=false
@@ -31,7 +33,7 @@
       "amount_total": 0.0,
       "payment_status":false,
       "payment_date": new Date(),      
-      "payment_type":data?.profile?"CASH":"ONLINE",
+      "payment_type":"ONLINE",
       "academic_year": data?.ayearList?.find(ob=>ob.is_active==true)?.id??0,
       "user": data?.profile?.id??''
     }
@@ -59,11 +61,15 @@
     }
     const fetchRecordWithEmail=async()=>{
       try{
-        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}"`)
+        console.log('$$$$',feesRecord.academic_year);
+        const record = await pb.collection('bus_fees').getFirstListItem(`stu_email="${feesRecord.stu_email}" && academic_year="${feesRecord.academic_year}" `,{expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',})
+        console.log(record);
         if(record){
           isRecordExist=true
           fetchDepartmentList(record.course)
           feesRecord=JSON.parse(JSON.stringify(record))
+          selectedRouteRecord=record.expand.route
+          console.log(feesRecord);
         }
       }catch(error1){
         console.log('****',error1)
@@ -105,12 +111,21 @@
       let record
       if(!isRecordExist){
         loading=true
-        const receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
+        let receipt_record=null
+        try{
+          receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
+        }catch(error1){
+            if(!receipt_record){
+            const temp1 = {
+                "number": 1,
+                "academic_year": feesRecord.academic_year
+            };
+            receipt_record = await pb.collection('receipt_number').create(temp1)
+          }
+        }
         feesRecord.receipt_number=new Date().getFullYear()+'_'+receipt_record.number.toString().padStart(5, '0')
         feesRecord.payment_date=new Date().toISOString()
         _.forEach(feesRecord,(value,name)=>{
-
-          
           if(name=='stu_name'){
             formData.append(name,value.toUpperCase())
           }
@@ -120,10 +135,12 @@
         record = await pb.collection('bus_fees').create(formData)
         console.log('----',record)
         if(record && feesRecord.payment_type=='ONLINE'){
+          feesRecord.id=record.id
           orderPlaced={
-            receipt:feesRecord?.id,
-            amount:feesRecord?.amount_paid,
+            receipt:record?.id,
+            amount:record?.amount_paid,
           }
+          console.log('----****',orderPlaced)
           loading=false
           return
         }
@@ -152,9 +169,10 @@
             order_id:feesRecord.id,            
             amount: feesRecord.amount_paid,
             currency:'INR',
-            redirect_url:'http://localhost:8080/api/ccAvenueResponse',
-            cancel_url:'http://localhost:8080/api/ccAvenueResponse',
+            redirect_url:'https://college-busseva.vercel.app/api/ccAvenueResponse', 
+            cancel_url:'https://college-busseva.vercel.app/api/ccAvenueResponse',
             language:'EN',            
+            traveller_name:selectedRouteRecord?.expand?.traveller?.name,
             billing_name:feesRecord.stu_name,
             billing_address:'Vasad',
             billing_city:'Vasad',
@@ -162,7 +180,7 @@
             billing_zip:'388306',
             billing_country:'India',
             billing_tel:feesRecord.stu_contact_number,
-            billing_email:feesRecord.stu_email            
+            billing_email:feesRecord.stu_email,                        
           }
           fetch('/api/payment', {
               method: 'POST',
@@ -200,7 +218,6 @@ const onFileChange=async()=>{
     for (let file of fileInput.files) {
       feesRecord.photo=file.name
       const reader = new FileReader();
-
       if(file.size>=2097152){
         error_mesg='Photo Size must be less then 2MB'
         window.scrollTo(0,0)
@@ -214,12 +231,12 @@ const onFileChange=async()=>{
     }  
 }
 
-
 const generateReceipt=async()=>{  
   console.log('----',feesRecord)
   receipt_print(feesRecord.id)
 }
 </script>
+
 {#if data?.status=='error'}
   <Alert dismissable>{data?.error}</Alert>
 {/if}
@@ -233,6 +250,8 @@ const generateReceipt=async()=>{
     <P class="text-center font-bold">Name: {feesRecord?.stu_name}</P>
     <P class="text-center font-bold">Contact: {feesRecord?.stu_contact_number}</P>
     <P class="text-center font-bold">Email: {feesRecord?.stu_email}</P>
+    <P class="text-center m-2 p-1 font-bold">Payment Receipt Number: <span class="bg-orange-500 text-white px-1 py-1 rounded">{feesRecord.id}</span></P>
+    <P class="text-center font-bold">Payment Amount: {feesRecord.amount_paid}</P>
   {#if feesRecord.payment_status==true}
     <P class="bg-slate-500 text-white p-2 text-center my-2 font-bold">Payment Already Done</P>
   {/if}
@@ -251,8 +270,8 @@ const generateReceipt=async()=>{
     <P class="text-center font-bold">Name: {feesRecord?.stu_name}</P>
     <P class="text-center font-bold">Contact: {feesRecord?.stu_contact_number}</P>
     <P class="text-center font-bold">Email: {feesRecord?.stu_email}</P>
-    <P class="text-center font-bold">Payment Receipt Number: {orderPlaced?.receipt}</P>
-    <P class="pb-4 mb-4 text-center font-bold border-b">Payment Amount: {orderPlaced?.amount/100.0} {orderPlaced?.currency}</P>
+    <P class="text-center font-bold">Payment Receipt Number: <span class="bg-orange-500 text-white px-1 py-1 rounded">{orderPlaced?.receipt}</span></P>
+    <P class="pb-4 mb-4 text-center font-bold border-b">Payment Amount: {orderPlaced?.amount}</P>
     <Button on:click={doPayment} color="green" class="mr-2">Proceed To Payment</Button>
     <Button on:click={()=>{orderPlaced=null;invalidateAll();}} color="red">Cancel</Button>
   </div>
@@ -304,8 +323,8 @@ const generateReceipt=async()=>{
           {#if feesRecord?.photo}
             <img class="w-48 h-48" src={feesRecord.photo} alt=""/>
           {/if}
-          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB)</span></Label>
-          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput" required></Input>
+          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB,Formats Supported "jpeg/png")</span></Label>
+          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput"  accept="image/jpeg,image/x-png" required></Input>
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-{2+1}">
           <div>
@@ -317,8 +336,14 @@ const generateReceipt=async()=>{
                 </span> 
               </Label>
               <Select on:change={(event)=>fetchDepartmentList(event.target.value)} bind:value={feesRecord.course} id="course" required>
+              
                 {#each data?.courseList as course}          
-                  <option value={course.id} >{course.name}</option>
+                  {#if data?.profile && course.name=='ACPC'}
+                    <option value={course.id} >{course.name}</option>
+                  {:else if course.name!=='ACPC'}
+                    <option value={course.id}>{course.name}</option>
+                  {/if}
+
                 {/each}
               </Select>   
           </div>
@@ -374,18 +399,18 @@ const generateReceipt=async()=>{
           <div>
             <Label class="mb-2 text-lg">Payement Amount</Label>
             <Input bind:value={feesRecord.amount_total} disabled></Input>
-
           </div>
           {#if data?.profile}
             <div>
               <Label class="mb-2 text-lg">Payment Method</Label>
               <div class="grid grid-cols-{2+1} w-full md:w-full">
-                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="CASH" class="w-full p-4">CASH</Radio>
-                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="QRCODE" class="w-full p-4">QR Code</Radio>
+                <!-- <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="CASH" class="w-full p-4">CASH</Radio>
+                <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="QRCODE" class="w-full p-4">QR Code</Radio> -->
                 <Radio bind:group={feesRecord.payment_type} color="blue" name="payment_type" value="ONLINE" class="w-full p-4">ONLINE</Radio>
               </div>
             </div>      
-          {/if}
+
+            {/if}
         </div>        
         {#if feesRecord.payment_type=='QRCODE'}
         <div class="w-full flex justify-center border">
@@ -408,4 +433,24 @@ const generateReceipt=async()=>{
     </form>  
   {/if}
 {/if}
+<Modal bind:open={popupModal} size="xs" autoclose>
+  <div class="text-justify p-2">
+    <h4 class="m-2 text-lg  text-gray-500 dark:text-gray-400 font-bold border-b text-center">Read This Before You Proceed</h4>
+    <p>
+      Do not exit the page or refresh the page while processing the payment to avoid any transaction issues.
+    </p>
+    <p>
+      After the payment is successfully made, you will be automatically redirected to a page to download your payment receipt.
+      <br>
+    </p>
+    <p>
+      Please, Also Note Down <span class="font-bold underline">Payment Receipt Number</span> Before Proceeding to Payment in case of any issue.
+    </p>
 
+    <p>
+      Click on the <b>"Download Receipt"</b> button to obtain a copy of your payment receipt for your records.
+    </p>
+    <div class="m-2 border-t"></div>
+    <Button color="red">Close</Button>
+  </div>
+</Modal>

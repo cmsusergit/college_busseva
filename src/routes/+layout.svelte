@@ -1,8 +1,8 @@
 <script>
-  import "../app.postcss";
+  import "../app.postcss"
 
   import Menu from "$lib/component/menu.svelte";
-  import Header from "$lib/component/header.svelte";
+  import Header from "$lib/component/header.svelte"
   import { navigating } from "$app/stores";
   import {Spinner,Modal} from 'flowbite-svelte'
   export let data

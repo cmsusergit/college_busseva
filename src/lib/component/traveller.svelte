@@ -1,4 +1,4 @@
-<script>
+<script>  
     import pb from '$lib/db'
     
     import DataTable from '$lib/datatable.svelte'
@@ -10,8 +10,8 @@
     import * as XLSX from 'xlsx/xlsx.mjs'    
     let dataTableInit=[],currRecord=null
     let dataTable=[],loading=false
-    export let is_auth
 
+    export let is_auth
     const convertToDtstring = (dt)=>{             
             let day = '' + dt.getDate()
             let month = '' + (dt.getMonth() + 1)       
@@ -38,6 +38,8 @@
             {slot:true}
         ]    
         onMount(async()=>{
+            loading=true
+            try {
             const temp1=`route.traveller.userid='${is_auth.id}'`
             const dt = await pb.collection('bus_fees').getFullList({
                 expand:'user,course,department,route,bus_point,route.traveller',                                      
@@ -45,6 +47,12 @@
                 sort:'-created'
             })
             processData(dt)
+        } catch (error) {                
+            console.log(error)
+        }
+        finally{
+            loading=false
+        }
         })
         const getDataByDuration=()=>{
             console.log(from_dt)
@@ -58,6 +66,9 @@
                 return (temp_pd>=temp_fd && temp_pd <= temp_td)
             })
             dataTable=[...tbl1]
+
+
+            console.log('----',dataTable);
             //....
             //....
         }
@@ -86,9 +97,11 @@
         const export2excel=()=>{
             loading=true
             let list1=new Array() 
-            dataTable.map(ob=>{            
-                    let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","done_by"])
-                    list1.push(temp)
+            dataTable.map(ob=>{       
+                    if(ob.payment_status==true)     {
+                        let temp=_.pick(ob,["receipt_number","payment_date","stu_name","enrollment_number","department","traveller","stu_contact_number","cash","qrcode","transaction_id","online","payment_status","done_by"])
+                        list1.push(temp)
+                    }
             })
             const wsheet=XLSX.utils.json_to_sheet(list1)
             const wb=XLSX.utils.book_new()            
@@ -98,9 +111,9 @@
         }
     </script>
 
-
-
-
+    {#if loading}
+        <p class="text-4xl text-center">Loading....</p>
+    {/if}
 
     <div class="flex md:flex-row flex-col">
         <div class="flex flex-col w-full md:w-1/2 m-1 px-1">
@@ -132,7 +145,6 @@
     {:else}
         <div class="text-2xl text-orange-800 p-2 text-center">Data Table is empty</div>
     {/if}
-
     <Modal bind:open={currRecord} title="Profile Detail">    
         <div>
             <Profile profile={currRecord}></Profile>
@@ -141,9 +153,14 @@
             <div class="text-right w-full">
                 <Button on:click={()=>currRecord=null} class="w-48 px-2">Close</Button>
             </div>
-
-
-
-
         </svelte:fragment>
     </Modal>
+
+
+
+
+
+
+
+
+

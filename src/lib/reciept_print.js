@@ -2,20 +2,42 @@ import pdfMake from "pdfmake/build/pdfmake"
 import 'pdfmake/build/vfs_fonts'
 
 import pb from '$lib/db.js'
+import * as CryptoJS from 'crypto-js';
+import QRCode from 'qrcode'
 import _ from 'lodash'
-
 export const receipt_print=async (id)=>{            
     const record = await pb.collection('bus_fees').getOne(id, {
+
         expand: 'academic_year,bus_point,course,department,route,route.city,route.traveller',
     });
     const ayear=record.expand.academic_year
-    const route=record.expand.route
 
+    const route=record.expand.route
     const course=record.expand.course
     const buspoint=record.expand.bus_point
     const department=record.expand.department
     const traveller=route.expand.traveller
     const imageurl=pb.files.getUrl(record,record.photo)
+    let qrcodeUrl=''
+    const encryptedText=CryptoJS.AES.encrypt(record.id,"ihavesecret").toString()
+    let opts = {
+        errorCorrectionLevel: 'H',
+        type: 'image/jpeg',
+    }
+    QRCode.toDataURL(encryptedText, opts, function (err, url) {
+        if (err) throw err
+        qrcodeUrl=url        
+    })    
+
+
+
+
+
+
+
+
+
+    
     const reportHeading={
         margin:[2,2,2,2],bold:true,
         alignment:'center',
@@ -31,8 +53,10 @@ export const receipt_print=async (id)=>{
     const content1={
         margin:[2,10,2,10],
         columns:[
-            {text:`Receipt Number: ${record.receipt_number}\nDate: ${new Date().toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'left',width:'*'},
-            {table:{body:[[{image:'photo',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'}
+            
+            {table:{body:[[{image:'photo',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'},
+            {text:`Receipt Number: ${record.id}\nDate: ${new Date(record.payment_date).toLocaleString('en-IN',{day:"numeric",month:"numeric",year:"numeric"})}`,alignment:'center',width:'*'},
+            {table:{body:[[{image:'qrcode',height:80,width:100,border:[true,true,true,true]}]]},width:'auto'}
         ]
     }
     const currencyFormat = Intl.NumberFormat('en-IN', {
@@ -46,8 +70,7 @@ export const receipt_print=async (id)=>{
         fontSize:11,
         text:[            
             'Received ',{text:`${currencyFormat.format(record.amount_paid)}`,bold:true,fontSize:11,decoration:'underline'}, 
-
-            ` Cash/Online  ${record.transaction_id?'Transaction ID: '+record.transaction_id:''}\nFrom, `,{text:` ${record.stu_name.toUpperCase()} (${record.enrollment_number})\n`,bold:true},
+            ` ${record.payment_type!=='ONLINE'?'Cash':'Online'} ${record.transaction_id?'Transaction ID: '+record.transaction_id:''}\nFrom, `,{text:` ${record.stu_name.toUpperCase()} (${record.enrollment_number})\n`,bold:true},
             {text:'Contact Number:  ',bold:true},`${record.stu_contact_number}  `,{text:'Email:  ',bold:true},`${record.stu_email}\n`,
             {text:'Course:  ',bold:true},`${course.name} (${course.alias})\n`,
             {text:'Department:  ',bold:true},`${department.name} (${department.alias}) \nOn `,
@@ -66,7 +89,6 @@ export const receipt_print=async (id)=>{
             {text:'  Route Name: ',bold:true},` ${route.name}`,
             {text:'  Pickup/Drop Point: ',bold:true},` ${buspoint.name}(${buspoint.alias})`
         ]}
-
         const footText='*This is a computer generated document , hence no signature is required'
     let reportDefination=[        
         {
@@ -80,10 +102,8 @@ export const receipt_print=async (id)=>{
         content1,
         contentText,
         contentText1,
-
         {margin:[2,2,2,2],fontSize:'10',alignment:'left',text:footText,color:'red'}, 
     ]   
-
     let reportDefination1=JSON.parse(JSON.stringify(reportDefination))
     pdfMake.fonts = {
         Courier: {
@@ -95,7 +115,6 @@ export const receipt_print=async (id)=>{
         Roboto: {
             normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf',
             bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf',
-
             italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf',
             bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf'
         },
@@ -111,7 +130,7 @@ export const receipt_print=async (id)=>{
         pageSize: 'A4',
 
 
-        images:{photo:{url:imageurl}},
+        images:{photo:{url:imageurl},qrcode:{url:qrcodeUrl}},
     })
     .open()
 }
