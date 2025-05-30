@@ -1,5 +1,5 @@
 <script>
-  import "../app.postcss";
+  import "../app.postcss"
 
   import Menu from "$lib/component/menu.svelte";
   import Header from "$lib/component/header.svelte";

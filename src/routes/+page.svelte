@@ -38,6 +38,23 @@
     let semList=[1,2,3,4,5,6,7,8,9,10],departmentList=[]
     let mesg,error_mesg
     let feesRecord=initialFormValue
+    const fetchAdmissionDetail=async(enrollment_number)=>{
+      console.log(enrollment_number)
+      let url1=`https://mhazmbcbujixalspvqrz.supabase.co/rest/v1/AdmissionFeesCollectionACPC?stu_college_id=eq.${enrollment_number}`
+      const api_cred=env.PUBLIC_SUPABASE_CRED
+      fetch(url1,
+        {method: 'GET', headers:{'Content-Type':'application/json','Authorization':`Bearer ${api_cred}`,'apikey': api_cred,}
+      }).then(response =>{
+          if(!response.ok) {        
+              throw new Error('Network Error' + response.statusText)
+          }    
+        return response.json()
+      }).then(data=>{    
+          console.log(data)
+      }).catch(error=>{
+          console.error('There was a problem with the fetch operation:', error)
+      });
+    }
     const fetchDepartmentList=async(value)=>{
       try{
             if(value==''){
@@ -72,6 +89,7 @@
     }
     onMount(async()=>{      
       feesRecord=initialFormValue
+      fetchAdmissionDetail("25BIDG001")
     })
 
     const onRouteSelected=async(dt)=>{
