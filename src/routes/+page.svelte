@@ -11,7 +11,7 @@
     export let data
     let selectedRouteRecord,orderPlaced
 
-    let isRecordExist=false
+    let isRecordExist=false,photoRequired=true
     let formData = new FormData()
     let is_submitted=false
     const initialFormValue={
@@ -38,9 +38,91 @@
     let semList=[1,2,3,4,5,6,7,8,9,10],departmentList=[]
     let mesg,error_mesg
     let feesRecord=initialFormValue
+/*    async function fetchResizeAndPrepareImage(db_url1,feesRecord,formData) {
+      try {
+        const response = await fetch(`${db_url1}/${feesRecord.photo}`)
+        const originalBlob = await response.blob()
+        const img = await new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = URL.createObjectURL(originalBlob);
+        })
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH =512;
+        const MAX_HEIGHT =512;
+        let { width, height }=img;
+        if (width > height && width >MAX_WIDTH) {
+          height *= MAX_WIDTH /width;
+          width = MAX_WIDTH;
+        } else if (height >MAX_HEIGHT) {
+          width *= MAX_HEIGHT /height;
+          height = MAX_HEIGHT;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+        let quality = 0.95;
+        let resizedBlob;
+        while (quality > 0.1) {
+          resizedBlob = await new Promise(resolve =>
+            canvas.toBlob(resolve, originalBlob.type, quality)
+          );
+          if (resizedBlob.size <= maxSizeBytes) break;
+          quality -= 0.05; // Reduce quality and retry
+        }
+
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          feesRecord.photo = reader.result
+        };
+        reader.readAsDataURL(resizedBlob)
+        formData.append('photo', resizedBlob, 'resized-photo.jpg')
+      } catch (error) {
+        console.error('Image resize or compression error:', error)
+      }
+    }
+*/
+    const processAdmissionDt=async(dt)=>{
+      console.log('****',dt.form_type)
+      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/storage/v1/object/public/userphoto/'
+      feesRecord.stu_name=dt.stu_name
+      if(dt.form_type=='ACPC'){
+        feesRecord.stu_email=dt?.ACPCFormInfo?.email
+        feesRecord.stu_contact_number=dt?.ACPCFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.ACPCFormInfo?.father_contact
+        feesRecord.photo=dt?.ACPCFormInfo?.photo
+      }
+      else if(dt.form_type=='MQNRI'){
+        feesRecord.stu_email=dt?.MQNRIFormInfo?.email
+        feesRecord.stu_contact_number=dt?.MQNRIFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.MQNRIFormInfo?.father_contact
+        feesRecord.photo=dt?.MQNRIFormInfo?.photo
+      }
+      else if(dt.form_type=='VACANT'){
+        feesRecord.stu_email=dt?.VacantFormInfo?.email
+        feesRecord.stu_contact_number=dt?.VacantFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.VacantFormInfo?.father_contact
+        feesRecord.photo=dt?.VacantFormInfo?.photo      
+      }
+      else{}
+      const response = await fetch(`${db_url1}/${feesRecord.photo}`)
+      const blob = await response.blob()
+
+      const reader = new FileReader();
+      reader.addEventListener("load", function () {        
+        feesRecord.photo=reader.result
+      });
+      reader.readAsDataURL(blob);
+      formData.append('photo',blob)
+      photoRequired=false
+    }
     const fetchAdmissionDetail=async(enrollment_number)=>{
       console.log(enrollment_number)
-      let url1=`https://mhazmbcbujixalspvqrz.supabase.co/rest/v1/AdmissionFeesCollectionACPC?stu_college_id=eq.${enrollment_number}`
+      let query_list='select=stu_name,ACPCFormInfo(*),MQNRIFormInfo(*),VacantFormInfo(*),form_type'
+      let url1=`https://mhazmbcbujixalspvqrz.supabase.co/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
       const api_cred=env.PUBLIC_SUPABASE_CRED
       fetch(url1,
         {method: 'GET', headers:{'Content-Type':'application/json','Authorization':`Bearer ${api_cred}`,'apikey': api_cred,}
@@ -49,8 +131,9 @@
               throw new Error('Network Error' + response.statusText)
           }    
         return response.json()
-      }).then(data=>{    
-          console.log(data)
+      }).then(dt=>{    
+          console.log(dt)
+          processAdmissionDt(dt[0])
       }).catch(error=>{
           console.error('There was a problem with the fetch operation:', error)
       });
@@ -89,9 +172,7 @@
     }
     onMount(async()=>{      
       feesRecord=initialFormValue
-      fetchAdmissionDetail("25BIDG001")
     })
-
     const onRouteSelected=async(dt)=>{
       if(!dt)return
       console.log('----',dt)
@@ -218,7 +299,6 @@ const onFileChange=async()=>{
     for (let file of fileInput.files) {
       feesRecord.photo=file.name
       const reader = new FileReader();
-
       if(file.size>=2097152){
         error_mesg='Photo Size must be less then 2MB'
         window.scrollTo(0,0)
@@ -229,10 +309,10 @@ const onFileChange=async()=>{
       });
       reader.readAsDataURL(file);
       formData.append('photo', file)
+
+
     }  
 }
-
-
 const generateReceipt=async()=>{  
   console.log('----',feesRecord)
   receipt_print(feesRecord.id)
@@ -292,7 +372,6 @@ const generateReceipt=async()=>{
                 <option value={record.id}>{record.name}</option>
               {/each}
             </Select>
-
           </div> 
         <div>
           <Label class="mb-2 text-lg" for="stu_email">Student Email<span class="ml-1 text-orange-700">*</span></Label>
@@ -300,8 +379,8 @@ const generateReceipt=async()=>{
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-2">
           <div>        
-            <Label for="enrollment_number" class="mb-2 text-lg">Enrollment/College ID/Form Number<span class="ml-1 text-orange-700">*</span></Label>
-            <Input bind:value={feesRecord.enrollment_number} type="text" id="enrollment_number" name="enrollment_number" required />
+            <Label for="enrollment_number" class="mb-2 text-lg">Enrollment/College ID/Form Number<span class="ml-1 text-orange-700">*</span></Label>            
+            <Input on:blur={()=>fetchAdmissionDetail(feesRecord.enrollment_number)} bind:value={feesRecord.enrollment_number} type="text" id="enrollment_number" name="enrollment_number" required />
           </div>
           <div>
             <Label for="enrollment_number" class="mb-2 text-lg">Student Name<span class="ml-1 text-orange-700">*</span></Label>            
@@ -322,8 +401,8 @@ const generateReceipt=async()=>{
           {#if feesRecord?.photo}
             <img class="w-48 h-48" src={feesRecord.photo} alt=""/>
           {/if}
-          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB)</span></Label>
-          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput" required></Input>
+          <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB)</span></Label>          
+          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput" required={photoRequired}></Input>
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-{2+1}">
           <div>
@@ -331,6 +410,7 @@ const generateReceipt=async()=>{
                 <span class="ml-1 text-orange-700">*
                   {#if loading_dept}
                     <Spinner></Spinner>
+
                   {/if}
                 </span> 
               </Label>
