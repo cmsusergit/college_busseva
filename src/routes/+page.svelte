@@ -86,7 +86,7 @@
     }
 */
     const processAdmissionDt=async(dt)=>{
-      console.log('****',dt.form_type)
+      loading=true
       const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
       feesRecord.stu_name=dt.stu_name
       if(dt.form_type=='ACPC'){
@@ -118,9 +118,11 @@
       reader.readAsDataURL(blob);
       formData.append('photo',blob)
       photoRequired=false
+      loading=false
     }
     const fetchAdmissionDetail=async(enrollment_number)=>{
       console.log(enrollment_number)
+      loading=true
       const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
       let query_list='select=stu_name,ACPCFormInfo(*),MQNRIFormInfo(*),VacantFormInfo(*),form_type'
       let url1=`${db_url1}/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
@@ -136,8 +138,10 @@
       }).then(dt=>{    
           console.log(dt)
           processAdmissionDt(dt[0])
+          loading=false
       }).catch(error=>{
           console.error('There was a problem with the fetch operation:', error)
+          loading=false
       });
     }
     const fetchDepartmentList=async(value)=>{
@@ -325,6 +329,16 @@ const generateReceipt=async()=>{
 {/if}
 {#if error_mesg}
   <Alert on:close={()=>{error_mesg=''}} dismissable>{error_mesg}</Alert>
+{/if}
+
+
+
+
+
+
+
+{#if loading}
+<p>LOADING....</p>
 {/if}
 {#if isRecordExist} 
   <div>
