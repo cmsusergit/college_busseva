@@ -124,6 +124,7 @@
       let query_list='select=stu_name,ACPCFormInfo(*),MQNRIFormInfo(*),VacantFormInfo(*),form_type'
       let url1=`https://mhazmbcbujixalspvqrz.supabase.co/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
       const api_cred=env.PUBLIC_SUPABASE_CRED
+      console.log('apicred',api_cred)
       fetch(url1,
         {method: 'GET', headers:{'Content-Type':'application/json','Authorization':`Bearer ${api_cred}`,'apikey': api_cred,}
       }).then(response =>{
