@@ -87,7 +87,7 @@
 */
     const processAdmissionDt=async(dt)=>{
       console.log('****',dt.form_type)
-      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/storage/v1/object/public/userphoto/'
+      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
       feesRecord.stu_name=dt.stu_name
       if(dt.form_type=='ACPC'){
         feesRecord.stu_email=dt?.ACPCFormInfo?.email
@@ -108,7 +108,7 @@
         feesRecord.photo=dt?.VacantFormInfo?.photo      
       }
       else{}
-      const response = await fetch(`${db_url1}/${feesRecord.photo}`)
+      const response = await fetch(`${db_url1}/storage/v1/object/public/userphoto/${feesRecord.photo}`)
       const blob = await response.blob()
 
       const reader = new FileReader();
@@ -121,8 +121,9 @@
     }
     const fetchAdmissionDetail=async(enrollment_number)=>{
       console.log(enrollment_number)
+      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
       let query_list='select=stu_name,ACPCFormInfo(*),MQNRIFormInfo(*),VacantFormInfo(*),form_type'
-      let url1=`https://mhazmbcbujixalspvqrz.supabase.co/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
+      let url1=`${db_url1}/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
       const api_cred=env.PUBLIC_SUPABASE_CRED
       console.log('apicred',api_cred)
       fetch(url1,
