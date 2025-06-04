@@ -13,7 +13,7 @@ const postReq = async function(data){
     
     console.log(data,body)
     encRequest = encrypt(body,workingKey)
-    let ccAvenueUrl=`https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${data.merchantId}&encRequest=${encRequest}&access_code=${accessCode}`
+    let ccAvenueUrl=`https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction&merchant_id=${data.merchantId}&encRequest=${encRequest}&access_code=${accessCode}`
     console.log(ccAvenueUrl);
     try {
         const response = await fetch(ccAvenueUrl, {
