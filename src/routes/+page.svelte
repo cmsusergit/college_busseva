@@ -210,6 +210,7 @@
       let record
       if(!isRecordExist){
         loading=true
+
         const receipt_record = await pb.collection('receipt_number').getFirstListItem(`academic_year="${feesRecord.academic_year}"`)        
         feesRecord.receipt_number=new Date().getFullYear()+'_'+receipt_record.number.toString().padStart(5, '0')
         feesRecord.payment_date=new Date().toISOString()
@@ -226,8 +227,8 @@
         console.log('----',record)
         if(record && feesRecord.payment_type=='ONLINE'){
           orderPlaced={
-            receipt:feesRecord?.id,
-            amount:feesRecord?.amount_paid,
+            receipt:record?.id,
+            amount:record?.amount_paid,
           }
           loading=false
           return
