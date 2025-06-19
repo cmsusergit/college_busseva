@@ -231,6 +231,7 @@
             amount:record?.amount_paid,
           }
           loading=false
+          feesRecord.id=record.id
           return
         }
         else{
