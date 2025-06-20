@@ -8,7 +8,7 @@
     import _ from 'lodash'    
     import {receipt_print} from '$lib/reciept_print.js'
 
-    let popupModal = true;
+    let popupModal =true,photoRequired=true
     let loading_dept=false,loading=false
 
     export let data
@@ -75,6 +75,68 @@
         console.log('****',error1)
         isRecordExist=false
       }
+    }
+
+    
+
+    const processAdmissionDt=async(dt)=>{
+      loading=true
+      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
+      feesRecord.stu_name=dt.stu_name
+      if(dt.form_type=='ACPC'){
+        feesRecord.stu_email=dt?.ACPCFormInfo?.email
+        feesRecord.stu_contact_number=dt?.ACPCFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.ACPCFormInfo?.father_contact
+        feesRecord.photo=dt?.ACPCFormInfo?.photo
+      }
+      else if(dt.form_type=='MQNRI'){
+        feesRecord.stu_email=dt?.MQNRIFormInfo?.email
+        feesRecord.stu_contact_number=dt?.MQNRIFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.MQNRIFormInfo?.father_contact
+        feesRecord.photo=dt?.MQNRIFormInfo?.photo
+      }
+      else if(dt.form_type=='VACANT'){
+        feesRecord.stu_email=dt?.VacantFormInfo?.email
+        feesRecord.stu_contact_number=dt?.VacantFormInfo?.contact
+        feesRecord.parent_contact_number=dt?.VacantFormInfo?.father_contact
+        feesRecord.photo=dt?.VacantFormInfo?.photo      
+      }
+      else{}
+      const response = await fetch(`${db_url1}/storage/v1/object/public/userphoto/${feesRecord.photo}`)
+      const blob = await response.blob()
+
+      const reader = new FileReader();
+      reader.addEventListener("load", function () {        
+        feesRecord.photo=reader.result
+      });
+      reader.readAsDataURL(blob);
+      formData.append('photo',blob)
+      photoRequired=false
+      loading=false
+    }
+    const fetchAdmissionDetail=async(enrollment_number)=>{
+      console.log(enrollment_number)
+      loading=true
+      const db_url1='https://mhazmbcbujixalspvqrz.supabase.co/'
+      let query_list='select=stu_name,ACPCFormInfo(*),MQNRIFormInfo(*),VacantFormInfo(*),form_type'
+      let url1=`${db_url1}/rest/v1/AdmissionFeesCollectionACPC?${query_list}&stu_college_id=eq.${enrollment_number}`
+      const api_cred=env.PUBLIC_SUPABASE_CRED
+      console.log('apicred',api_cred)
+      fetch(url1,
+        {method: 'GET', headers:{'Content-Type':'application/json','Authorization':`Bearer ${api_cred}`,'apikey': api_cred,}
+      }).then(response =>{
+          if(!response.ok) {        
+              throw new Error('Network Error' + response.statusText)
+          }    
+        return response.json()
+      }).then(dt=>{    
+          console.log(dt)
+          processAdmissionDt(dt[0])
+          loading=false
+      }).catch(error=>{
+          console.error('There was a problem with the fetch operation:', error)
+          loading=false
+      });
     }
     onMount(async()=>{      
       feesRecord=initialFormValue
@@ -302,7 +364,8 @@ const generateReceipt=async()=>{
         <div class="grid gap-4 mb-4 md:grid-cols-2">
           <div>        
             <Label for="enrollment_number" class="mb-2 text-lg">Enrollment/College ID/Form Number<span class="ml-1 text-orange-700">*</span></Label>
-            <Input bind:value={feesRecord.enrollment_number} type="text" id="enrollment_number" name="enrollment_number" required />
+
+            <Input  on:blur={()=>fetchAdmissionDetail(feesRecord.enrollment_number)} bind:value={feesRecord.enrollment_number} type="text" id="enrollment_number" name="enrollment_number" required />
           </div>
           <div>
             <Label for="enrollment_number" class="mb-2 text-lg">Student Name<span class="ml-1 text-orange-700">*</span></Label>            
@@ -324,7 +387,7 @@ const generateReceipt=async()=>{
             <img class="w-48 h-48" src={feesRecord.photo} alt=""/>
           {/if}
           <Label class="mb-2 text-lg" for="fileInput">Photo<span class="ml-1 text-orange-700">* (size must be less then 2MB,Formats Supported "jpeg/png")</span></Label>
-          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput"  accept="image/jpeg,image/x-png" required></Input>
+          <Input on:change={onFileChange} src={feesRecord.photo} type="file" id="fileInput"  accept="image/jpeg,image/x-png" required={photoRequired}></Input>
         </div>
         <div class="grid gap-4 mb-4 md:grid-cols-{2+1}">
           <div>
